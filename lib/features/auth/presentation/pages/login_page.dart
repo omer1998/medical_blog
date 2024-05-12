@@ -8,6 +8,7 @@ import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart'
 import 'package:medical_blog_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:medical_blog_app/features/auth/presentation/widgets/auth_field.dart';
 import 'package:medical_blog_app/features/auth/presentation/widgets/auth_gradient_button.dart';
+import 'package:medical_blog_app/features/blog/presentation/pages/blog_page.dart';
 
 class LoginPage extends StatefulWidget {
   static route() {
@@ -42,18 +43,13 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state is AuthFailure) {
             showSnackBar(context, state.message);
+          } else if (state is AuthSuccess) {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+              builder: (context) {
+                return BlogPage();
+              },
+            ), (_) => false);
           }
-          // else if (state is AuthSuccess) {
-          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-          //     builder: (context) {
-          //       return Scaffold(
-          //         body: Center(
-          //           child: Text("Home Page"),
-          //         ),
-          //       );
-          //     },
-          //   ), (_) => false);
-          // }
         },
         builder: (context, state) {
           if (state is AuthLoading) {

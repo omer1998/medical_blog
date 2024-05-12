@@ -53,7 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   void _onUserState(UserStateEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     final either = await _userStateUseCase(event.noParams);
-    either.fold((l) => AuthFailure(l.message), (r) {
+    either.fold((l) => emit(AuthFailure(l.message)), (r) {
       if (r != null) {
         return _emitAuthSuccess(emit, r);
       } else {

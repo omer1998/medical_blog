@@ -1,0 +1,3 @@
+add update blog feature
+add cases features
+add medical calculation and drug doses

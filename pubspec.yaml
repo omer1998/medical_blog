@@ -40,6 +40,17 @@ dependencies:
   get_it: ^7.6.9
   dotted_border: ^2.1.0
   image_picker: ^1.1.0
+  uuid: ^4.4.0
+  intl: ^0.19.0
+  internet_connection_checker_plus: ^2.3.0
+
+  hive: ^2.2.3
+  hive_flutter:
+  isar_flutter_libs: ^4.0.0-dev.13
+  path_provider: ^2.1.0
+  # cached_network_image: ^3.3.1
+  fast_cached_network_image: ^1.2.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

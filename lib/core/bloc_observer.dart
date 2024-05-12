@@ -5,6 +5,6 @@ class MyBlocObserver extends BlocObserver {
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
     print("==> $change");
-    print(bloc.state);
+    print(change.nextState);
   }
 }
