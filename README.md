@@ -17,9 +17,13 @@ samples, guidance on mobile development, and a full API reference.
 
 
 ![Screenshot 2024-05-16 182318](https://github.com/omer1998/medical_blog/assets/43358116/e2e5e3f7-a293-4f6d-9b7a-7635146d4c5b)
+
 ![Screenshot 2024-05-16 182434](https://github.com/omer1998/medical_blog/assets/43358116/f0df7c59-1e68-4ccd-9efa-2a207a377e37)
+
 ![Screenshot 2024-05-16 182616](https://github.com/omer1998/medical_blog/assets/43358116/d17958bb-fd96-4504-9004-84e3f1d89231)
+
 ![Screenshot 2024-05-16 182640](https://github.com/omer1998/medical_blog/assets/43358116/16662b51-42db-4b9e-92d4-8d78d15fe177)
+
 
 ## Database And Backend
 we used supabase as a backend service (which use postgresql as db management system)
