@@ -19,3 +19,4 @@ final class BlogUploadBlogEvent extends BlogEvent {
 }
 
 final class BlogFetchBlogsEvent extends BlogEvent {}
+

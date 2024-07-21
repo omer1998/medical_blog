@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dotted_border/dotted_border.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/core/common/widgets/loader.dart';
@@ -36,6 +39,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
   ];
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
+  final QuillController _quillController = QuillController.basic();
 
   List<String> selectedTopics = [];
   @override
@@ -43,6 +47,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
     super.dispose();
     titleController.dispose();
     contentController.dispose();
+    _quillController.dispose();
   }
 
   File? image;
@@ -61,8 +66,10 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
     return BlocListener<BlogBloc, BlogState>(
       listener: (context, state) {
         if (state is BlogSuccessState) {
-          Navigator.pushAndRemoveUntil(
-              context, BlogPage.route(), (route) => false);
+          GoRouter.of(context).pushReplacementNamed("main");
+          showSnackBar(context, "Blog uploaded successfully");
+            
+          
         } else if (state is BlogFailureState) {
           print(state.message);
           showSnackBar(context, state.message);
@@ -73,8 +80,24 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
             actions: [
               IconButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate() && image != null) {
+                    // print(_quillController.document. toDelta().toJson());
+                    if (image == null) {
+                      showSnackBar(context, "Image is required");
+                    }
+
+                    if (_quillController.document.isEmpty()) {
+                      showSnackBar(context, "Content is required");
+                      // print(_quillController.document.toPlainText());
+                    } else {
+                      print(jsonEncode(
+                          _quillController.document.toDelta().toJson()));
+                    }
+                    if (_formKey.currentState!.validate() &&
+                        image != null &&
+                        !_quillController.document.isEmpty()) {
                       print("--- id ---");
+                      print("contenttttt");
+
                       print((BlocProvider.of<AppUserCubit>(context).state
                               as UserLoggedInState)
                           .user
@@ -87,7 +110,8 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                                   .id,
                               image: image!,
                               title: titleController.text.trim(),
-                              content: contentController.text.trim(),
+                              content: jsonEncode(
+                                  _quillController.document.toDelta().toJson()),
                               topics: selectedTopics));
                     }
                   },
@@ -193,8 +217,37 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                         SizedBox(
                           height: 15,
                         ),
-                        BlogEditor(
-                            controller: contentController, hintText: "Content"),
+                        // BlogEditor(
+                        //     controller: contentController, hintText: "Content"),
+
+                        QuillToolbar.simple(
+                          configurations: QuillSimpleToolbarConfigurations(
+                            controller: _quillController,
+                            multiRowsDisplay: false,
+                            // embedButtons: FlutterQuillEmbeds.toolbarButtons(), // to imbed images or videos
+                            sharedConfigurations:
+                                const QuillSharedConfigurations(
+                              locale: Locale('de'),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        QuillEditor.basic(
+                          configurations: QuillEditorConfigurations(
+                            controller: _quillController,
+                            // embedBuilders: FlutterQuillEmbeds.editorBuilders(),
+                            autoFocus: true,
+                            padding: EdgeInsets.all(10),
+                            placeholder: "Start Writing your blog... ",
+                            scrollable: true,
+                            sharedConfigurations:
+                                const QuillSharedConfigurations(
+                              locale: Locale('de'),
+                            ),
+                          ),
+                        ),
                       ]),
                     )),
               );

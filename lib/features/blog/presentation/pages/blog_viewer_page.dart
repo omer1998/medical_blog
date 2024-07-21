@@ -1,7 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:convert';
+
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:medical_blog_app/core/network/connection_checker.dart';
@@ -12,7 +15,7 @@ import 'package:medical_blog_app/core/utils/check_connection.dart';
 
 import 'package:medical_blog_app/features/blog/domain/entities/blog_entity.dart';
 
-class BlogViewerPage extends StatelessWidget {
+class BlogViewerPage extends StatefulWidget {
   static route({required BlogEntity blog}) =>
       MaterialPageRoute(builder: (_) => BlogViewerPage(blog: blog));
   final BlogEntity blog;
@@ -22,12 +25,32 @@ class BlogViewerPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<BlogViewerPage> createState() => _BlogViewerPageState();
+}
+
+class _BlogViewerPageState extends State<BlogViewerPage> {
+  @override
   Widget build(BuildContext context) {
     // print("Author name inside blog viewer page");
     // print(blog.authorName);
+     QuillController _qController;
+    if (widget.blog.content.startsWith('[{"insert":')){
+   _qController = QuillController(readOnly: true, document: Document.fromJson(jsonDecode(widget.blog.content)), selection: TextSelection.collapsed(offset: 0));
+
+    }else {
+       _qController = QuillController.basic();
+    }
+
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon:Icon(Icons.more_vert, color: AppPallete.gradient1,),
+            onPressed: () {},
+          )
+        ]
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Scrollbar(
@@ -36,7 +59,7 @@ class BlogViewerPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  blog.title,
+                  widget.blog.title,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -46,14 +69,14 @@ class BlogViewerPage extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  "By ${capitalizeFirstLetter(blog.authorName ?? "Unkown author")}",
+                  "By ${capitalizeFirstLetter(widget.blog.authorName ?? "Unkown author")}",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(
                   height: 5,
                 ),
                 Text(
-                  "${DateFormat("d MMM y").format(blog.publishedDate)}  ${calculateReadingTime(blog.content)} min.",
+                  "${DateFormat("d MMM y").format(widget.blog.publishedDate)}  ${calculateReadingTime(widget.blog.content)} min.",
                   style: TextStyle(fontSize: 15, color: AppPallete.greyColor),
                 ),
                 SizedBox(
@@ -132,7 +155,7 @@ class BlogViewerPage extends StatelessWidget {
                   child: FastCachedImage(
                     height: 300,
                     fit: BoxFit.cover,
-                    url: blog.imageUrl,
+                    url: widget.blog.imageUrl,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         height: 300,
@@ -163,10 +186,11 @@ class BlogViewerPage extends StatelessWidget {
                 ),
 
                 SizedBox(
-                  height: 15,
+                  height: 20,
                 ),
+                widget.blog.content.startsWith('[{"insert":') ? QuillEditor(configurations: QuillEditorConfigurations(enableInteractiveSelection: false, controller: _qController), focusNode: FocusNode(), scrollController: ScrollController(),) :
                 Text(
-                  blog.content,
+                  widget.blog.content,
                   style: TextStyle(fontSize: 16, height: 1.5),
                 )
               ],

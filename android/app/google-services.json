@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "911802630885",
+    "project_id": "medical-blog-app",
+    "storage_bucket": "medical-blog-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911802630885:android:ff283080de6dde0c770a0c",
+        "android_client_info": {
+          "package_name": "com.example.medical_blog_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3r3W-JBWHMOwMHV0Xb7t-HWsGr0Aokgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

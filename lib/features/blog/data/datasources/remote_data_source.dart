@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medical_blog_app/core/error/exceptions.dart';
 import 'package:medical_blog_app/features/blog/data/models/blog_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,17 +11,18 @@ abstract interface class BlogRemoteDataSource {
   Future<List<BlogModel>> fetchAllBlogs();
 }
 
+
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   final SupabaseClient supabaseClient;
 
-  BlogRemoteDataSourceImpl({required this.supabaseClient});
+  BlogRemoteDataSourceImpl({ required this.supabaseClient});
   @override
   Future<BlogModel> uploadBlog(BlogModel blog) async {
     try {
-      print("insert blog to database");
-      print(blog.toString());
+      print(blog.toMapInsert());
       final insertedBlog =
-          await supabaseClient.from("blogs").insert(blog.toMap()).select();
+          await supabaseClient.from("blogs").insert(blog.toMapInsert()).select('* , profiles(id, name)');
+          print("this is the blog --> ${insertedBlog.first}");
       return BlogModel.fromMap(insertedBlog.first);
     } on PostgrestException catch (e) {
       throw ServerException(e.message);

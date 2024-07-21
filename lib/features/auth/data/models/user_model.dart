@@ -9,6 +9,14 @@ class UserModel extends UserEntity {
     );
   }
 
+  factory UserModel.fromJsonDatabase(Map<String, dynamic> map) {
+    return UserModel(
+      name: map["user_metadata"]['name'] ?? "",
+      email: map["user_metadata"]['email'] ?? '',
+      id: map["id"] ?? '',
+    );
+  }
+
   UserModel({required super.name, required email, required id})
       : super(email: email, id: id);
 

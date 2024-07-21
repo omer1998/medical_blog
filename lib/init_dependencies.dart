@@ -7,6 +7,7 @@ import 'package:medical_blog_app/core/network/connection_checker.dart';
 import 'package:medical_blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:medical_blog_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:medical_blog_app/features/auth/domain/repository/auth_repository.dart';
+import 'package:medical_blog_app/features/auth/domain/usecases/log_out_usecase.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
@@ -50,12 +51,14 @@ void initAuth() {
 
   getIt.registerFactory<SignInUseCase>(
       () => SignInUseCase(authRepository: getIt()));
+  getIt.registerFactory<LogOutUsecase>(()=> LogOutUsecase(authRepository: getIt()));
 
   getIt.registerFactory<UserStateUseCase>(
       () => UserStateUseCase(authRepository: getIt()));
 
   getIt.registerLazySingleton(() => AppUserCubit());
   getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(
+    logOutUsecase: getIt(),
       signUpUseCase: getIt(),
       signInUseCase: getIt(),
       userStateUseCase: getIt(),

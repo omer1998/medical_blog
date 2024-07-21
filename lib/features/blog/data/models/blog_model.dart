@@ -28,7 +28,17 @@ class BlogModel extends BlogEntity {
       "author_name": authorName
     };
   }
-
+  Map<String, dynamic> toMapInsert(){
+    return <String, dynamic>{
+      'id': id,
+      'title': title,
+      'content': content,
+      'author_id': authorId,
+      'published_date': publishedDate.toIso8601String(),
+      'topics': topics,
+      'image_url': imageUrl,
+    };
+  }
   factory BlogModel.fromMap(Map<dynamic, dynamic> map) {
     return BlogModel(
         id: map['id'] as String,
@@ -38,7 +48,7 @@ class BlogModel extends BlogEntity {
         publishedDate: DateTime.parse(map['published_date']),
         topics: List.from(map['topics']).cast<String>(),
         imageUrl: map["image_url"],
-        authorName: map['profiles']['name']);
+        authorName: map['profiles']['name'] ?? "");
   }
   factory BlogModel.fromJson(Map<dynamic, dynamic> map) {
     return BlogModel(

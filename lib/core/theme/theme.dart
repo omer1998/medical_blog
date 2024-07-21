@@ -6,6 +6,9 @@ class AppTheme {
       borderSide: BorderSide(color: color, width: 3),
       borderRadius: BorderRadius.circular(10));
   static final darkTheme = ThemeData.dark(useMaterial3: true).copyWith(
+    buttonTheme: ButtonThemeData(
+      buttonColor: AppPallete.gradient2
+    ),
       scaffoldBackgroundColor: AppPallete.backgroundColor,
       appBarTheme: AppBarTheme(backgroundColor: AppPallete.backgroundColor),
       inputDecorationTheme: InputDecorationTheme(

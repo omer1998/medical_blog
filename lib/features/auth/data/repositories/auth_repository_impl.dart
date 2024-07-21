@@ -62,7 +62,7 @@ class AuthRepositoryImpl implements AuthRepository {
         final session = authRemoteDataSource.userSession;
         if (session != null) {
           return right(UserEntity(
-              name: "", email: session.user.email ?? "", id: session.user.id));
+              name:  "", email: session.user.email ?? "", id: session.user.id));
         }
         return left(Failure(message: Constants.errorConnectionMessage));
       }
@@ -75,5 +75,16 @@ class AuthRepositoryImpl implements AuthRepository {
     } on ServerException catch (e) {
       return left(Failure(message: e.message));
     }
+  }
+  
+  @override
+  Future<Either<Failure, void>> logOut() async {
+    try {
+       final res = await authRemoteDataSource.logOut();
+      return right(res);
+    } catch (e) {
+      return left(Failure(message: e.toString()));
+    }
+    
   }
 }

@@ -20,3 +20,12 @@ final class UserStateEvent extends AuthEvent {
 
   UserStateEvent({required this.noParams});
 }
+
+final class LogOutEvent extends AuthEvent {
+  final NoParams noParams;
+  final BuildContext context;
+
+  LogOutEvent({required this.noParams, required this.context});
+
+
+}

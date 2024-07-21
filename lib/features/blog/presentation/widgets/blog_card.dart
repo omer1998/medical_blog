@@ -1,8 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import 'package:medical_blog_app/core/theme/app_pallete.dart';
 import 'package:medical_blog_app/core/utils/calculate_reading_time.dart';
+import 'package:medical_blog_app/core/utils/extensions.dart';
 import 'package:medical_blog_app/features/blog/domain/entities/blog_entity.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/blog_viewer_page.dart';
 
@@ -17,6 +21,13 @@ class BlogCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Document document; 
+    // if (blog.content.startsWith('[{"insert":')){
+    // document = Document.fromJson(jsonDecode(blog.content));
+
+    // }else{
+    //   document= Document();
+    // }
     return Padding(
         padding: EdgeInsets.all(8.0),
         child: GestureDetector(
@@ -37,24 +48,27 @@ class BlogCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: blog.topics
-                              .map(
-                                (e) => Container(
-                                  margin: EdgeInsets.only(right: 5),
-                                  child: Chip(
-                                      side: BorderSide.none,
-                                      clipBehavior: Clip.antiAlias,
-                                      label: Text(e)),
-                                ),
-                              )
-                              .toList(),
+                        SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: blog.topics
+                                .map(
+                                  (e) => Container(
+                                    margin: EdgeInsets.only(right: 5),
+                                    child: Chip(
+                                        side: BorderSide.none,
+                                        clipBehavior: Clip.antiAlias,
+                                        label: Text(e)),
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         ),
                         SizedBox(
                           height: 7,
                         ),
                         Text(
-                          blog.title,
+                          blog.title.capitalize(),
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
@@ -63,12 +77,11 @@ class BlogCard extends StatelessWidget {
                                   color: Colors.black87,
                                   fontWeight: FontWeight.bold),
                         ),
+                        Text("By ${blog.authorName}",
+                        style: TextStyle(color: AppPallete.backgroundColor, fontWeight: FontWeight.w500),),
                       ],
                     ),
-                    Text(
-                      "${calculateReadingTime(blog.content)} min",
-                      style: TextStyle(color: AppPallete.backgroundColor),
-                    )
+                    
                   ],
                 ),
               )),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/core/common/widgets/loader.dart';
 import 'package:medical_blog_app/core/theme/app_pallete.dart';
 import 'package:medical_blog_app/core/utils/show_snackbar.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:medical_blog_app/features/auth/presentation/widgets/auth_field.dart';
@@ -25,6 +28,12 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    
+  }
   @override
   void dispose() {
     emailController.dispose();
@@ -44,12 +53,18 @@ class _LoginPageState extends State<LoginPage> {
           if (state is AuthFailure) {
             showSnackBar(context, state.message);
           } else if (state is AuthSuccess) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BlogPage();
-              },
-            ), (_) => false);
+            print("login user");
+            print(state.user.name);
+            BlocProvider.of<AppUserCubit>(context).updateUser(state.user);
+            GoRouter.of(context).goNamed("main");
           }
+          // else if (state is AuthSuccess) {
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BlogPage();
+          //     },
+          //   ), (_) => false);
+          // }
         },
         builder: (context, state) {
           if (state is AuthLoading) {
