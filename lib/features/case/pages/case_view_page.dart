@@ -85,19 +85,18 @@ changeTileState (bool state, ExpansionTileController controller){
           children: [
             CaseText(text: widget.myCase.case_name.capitalize()),
             Row(
-              children: [
-                Container(
+              children: widget.myCase.tags!.map((e) => Container(
                   margin: EdgeInsets.only(right: 5),
-                  child: Chip(
+                  child:  Chip(
                       backgroundColor: Colors.grey,
                       side: BorderSide.none,
                       clipBehavior: Clip.antiAlias,
                       label: Text(
-                        "Respiratory",
+                        e,
                         style: TextStyle(color: Colors.black),
                       )),
-                ),
-              ],
+                ) ).toList()
+                
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

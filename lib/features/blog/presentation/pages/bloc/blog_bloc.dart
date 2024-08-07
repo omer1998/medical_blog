@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
+import 'package:medical_blog_app/features/blog/domain/usecases/fav_blog_usecase.dart';
 import 'package:meta/meta.dart';
 
 import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
@@ -17,7 +18,10 @@ part 'blog_state.dart';
 class BlogBloc extends Bloc<BlogEvent, BlogState> {
   final UploadBlogUseCase uploadBlogUseCase;
   final FetchBlogsUseCase fetchBlogsUseCase;
+  final FavBlogUseCase favBlogUseCase;
+
   BlogBloc({
+    required this.favBlogUseCase,
     required this.uploadBlogUseCase,
     required this.fetchBlogsUseCase,
   }) : super(BlogInitial()) {
@@ -25,6 +29,21 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     //   emit(BlogLoadingState());
     // });
 
+    on<FavBlogEvent>((event, emit)async {
+      emit(FavBlogLoadingState());
+      final res = await favBlogUseCase(FavParams(event.blogId, event.userId));
+      res.fold((f){
+        emit(FavBlogFailureState(message: f.message));
+      }, (s){
+        emit(FavBlogSuccessState());
+      });
+      
+    },);
+    // on<GetFavBlogsEvent>((event, emit) {
+    //   emit(FavBlogSuccessState());
+
+
+    // },);
     on<BlogUploadBlogEvent>(
       (event, emit) async {
         emit(BlogLoadingState());

@@ -17,6 +17,7 @@ import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecas
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/blog/data/datasources/remote_data_source.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/blog_page.dart';
+import 'package:medical_blog_app/features/case/data_source.dart/local_data_source.dart';
 import 'package:medical_blog_app/features/case/pages/add_case_page.dart';
 import 'package:medical_blog_app/features/case/pages/cases_page.dart';
 import 'package:medical_blog_app/features/main/main_controller.dart';
@@ -42,6 +43,7 @@ class MainPage extends ConsumerStatefulWidget {
 
 class _MainPageState extends ConsumerState<MainPage> {
   late final notificationService;
+  late final user;
   int _selectedIndex = 0;
   final pages = [
     BlogPage(),
@@ -60,8 +62,10 @@ class _MainPageState extends ConsumerState<MainPage> {
   @override
   void initState()  {
     // TODO: implement initState
-    try {final user = (context.read<AppUserCubit>().state as UserLoggedInState).user;
+    try {
+      user = (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState).user;
     // _initFcmToken(user);
+  
     notificationService = FirebaseNotificationService(context:context ,user: user, supabaseClient: getIt<SupabaseClient>());
   
     
@@ -138,11 +142,18 @@ _saveFcmToken(String token, UserEntity user) async{
 
   @override
   Widget build(BuildContext context) {
+    // user = (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState).user;
     return Scaffold(
       // appBar: AppBar(
       //   actions: [
-      //     TextButton(onPressed: (){
-            
+      //     TextButton(onPressed: ()async{
+      //   final res = await ref.read(casesLocalDataSourceProvider).retrieveCases();
+      //     res.fold((failure){
+      //         showSnackBar(context, failure.message);
+      //     }, (cases){
+      //       print("local cases");
+      //       print(cases.length.toString());
+      //     }); 
       //     }, child: Text("show note"))
       //   ],
       // ),

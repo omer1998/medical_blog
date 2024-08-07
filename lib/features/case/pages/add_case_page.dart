@@ -388,6 +388,7 @@ class _AddCasePageState extends ConsumerState<AddCasePage>
           //     ),
           //   ),
           // ),
+          TopicTags(tags: topicTags),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Align(

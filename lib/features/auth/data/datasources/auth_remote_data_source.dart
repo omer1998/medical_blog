@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:medical_blog_app/core/error/exceptions.dart';
 import 'package:medical_blog_app/features/auth/data/models/user_model.dart';
 
+
 abstract interface class AuthRemoteDataSource {
   Session? get userSession;
   Future<UserModel?> getUser();
@@ -48,8 +49,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       print(res.user!.toJson());
       print(res.user!.userMetadata);
       if (res.user != null) {
-       
-        return UserModel.fromJsonDatabase(res.user!.toJson());
+        final userData = await supabaseClient.from("profiles").select().eq("id", res.user!.id).single();
+        print(userData);
+        return UserModel.fromJson(userData);
       } else {
         throw ServerException("User is null !!");
       }
@@ -91,6 +93,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             .from("profiles")
             .select()
             .eq("id", userSession!.user.id);
+
+            print("query of user");
+            print(query);
         final user = UserModel.fromJson(query.first);
         // .copyWith(email: userSession!.user.email);
         // print("0000000000000000000");

@@ -18,5 +18,22 @@ final class BlogUploadBlogEvent extends BlogEvent {
       required this.topics});
 }
 
+
 final class BlogFetchBlogsEvent extends BlogEvent {}
 
+final class FavBlogEvent extends BlogEvent{
+  final String blogId;
+  final String userId;
+  FavBlogEvent({required this.blogId, required this.userId});
+}
+
+final class GetFavBlogsEvent extends BlogEvent{
+  final String userId;
+  GetFavBlogsEvent({required this.userId});
+}
+
+final class RemoveFavBlogEvent extends BlogEvent{
+  final String blogId;
+  final String userId;
+  RemoveFavBlogEvent({required this.blogId, required this.userId});
+}

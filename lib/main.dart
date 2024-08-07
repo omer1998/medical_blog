@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:medical_blog_app/core/bloc_observer.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/core/entities/user.dart';
@@ -44,7 +46,11 @@ void main() async {
   
 
   Bloc.observer = MyBlocObserver();
-  await initDependencies();
+
+  await Hive.initFlutter();
+  final blogsBox = await Hive.openBox("blogs");
+  
+  await initDependencies(blogsBox);
   String storageLocation = (await getApplicationDocumentsDirectory()).path;
   await FastCachedImageConfig.init(
       subDir: storageLocation, clearCacheAfter: const Duration(days: 15));

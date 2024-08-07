@@ -9,6 +9,7 @@ abstract interface class BlogRemoteDataSource {
   Future<BlogModel> uploadBlog(BlogModel blog);
   Future<String> uploadImage(BlogModel blog, File image);
   Future<List<BlogModel>> fetchAllBlogs();
+  Future<void> favBlog(String userId, String blogId);
 }
 
 
@@ -55,6 +56,21 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
       throw ServerException(e.message);
     } catch (e) {
       throw ServerException(e.toString());
+    }
+  }
+  
+  @override
+  Future<void> favBlog(String userId, String blogId) async{
+    try {
+      await supabaseClient.from("fav_blogs").insert({
+      "user_id": userId,
+      "blog_id": blogId,
+    
+    }); 
+    return ;
+
+    } catch (e) {
+      rethrow;
     }
   }
 }

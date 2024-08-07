@@ -1,4 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+
+final connectionCheckerProvider = Provider<ConnectionChecker>((ref) {
+  return ConnectionCheckerImpl(internetConnection: InternetConnection()) ;
+});
 
 abstract interface class ConnectionChecker {
   Future<bool> get isConnected;

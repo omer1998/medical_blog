@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/core/network/connection_checker.dart';
+import 'package:medical_blog_app/core/profile_local_datasource.dart';
 import 'package:medical_blog_app/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:medical_blog_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:medical_blog_app/features/auth/domain/repository/auth_repository.dart';
@@ -16,6 +17,7 @@ import 'package:medical_blog_app/features/blog/data/datasources/local_data_sourc
 import 'package:medical_blog_app/features/blog/data/datasources/remote_data_source.dart';
 import 'package:medical_blog_app/features/blog/data/repositories/blog_repository_impl.dart';
 import 'package:medical_blog_app/features/blog/domain/repositories/blog_repository.dart';
+import 'package:medical_blog_app/features/blog/domain/usecases/fav_blog_usecase.dart';
 import 'package:medical_blog_app/features/blog/domain/usecases/fetch_blogs_usecase.dart';
 import 'package:medical_blog_app/features/blog/domain/usecases/upload_blog_usecase.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/bloc/blog_bloc.dart';
@@ -24,7 +26,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/secrets/app_secrets.dart';
 
 final getIt = GetIt.instance;
-Future<void> initDependencies() async {
+Future<void> initDependencies(Box blogsBox) async {
   final supabase = await Supabase.initialize(
       url: AppSecrets.supabaseUrl, anonKey: AppSecrets.supabaseAnonKey);
 
@@ -33,39 +35,40 @@ Future<void> initDependencies() async {
   getIt.registerFactory<ConnectionChecker>(
       () => ConnectionCheckerImpl(internetConnection: getIt()));
 
-  await Hive.initFlutter();
-  final blogsBox = await Hive.openBox("blogs");
   getIt.registerLazySingleton<Box>(() => blogsBox);
+  // getIt.registerLazySingleton<Box>(() => casesBox);
 
   initAuth();
-  initBlogs();
+  initBlogs(blogsBox);
 }
 
 void initAuth() {
+  getIt.registerFactory<ProfileLocalDatasource>(() => ProfileLocalDatasource());
   getIt.registerFactory<AuthRemoteDataSource>(
       () => AuthRemoteDataSourceImpl(supabaseClient: getIt()));
   getIt.registerFactory<AuthRepository>(() => AuthRepositoryImpl(
-      authRemoteDataSource: getIt(), connectionChecker: getIt()));
+      authRemoteDataSource: getIt(), connectionChecker: getIt(), profileLocalDatasource: getIt()));
   getIt.registerFactory<SignUpUseCase>(
       () => SignUpUseCase(authRepository: getIt()));
 
   getIt.registerFactory<SignInUseCase>(
       () => SignInUseCase(authRepository: getIt()));
-  getIt.registerFactory<LogOutUsecase>(()=> LogOutUsecase(authRepository: getIt()));
+  getIt.registerFactory<LogOutUsecase>(
+      () => LogOutUsecase(authRepository: getIt()));
 
   getIt.registerFactory<UserStateUseCase>(
       () => UserStateUseCase(authRepository: getIt()));
 
-  getIt.registerLazySingleton(() => AppUserCubit());
+  getIt.registerLazySingleton<AppUserCubit>(() => AppUserCubit());
   getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(
-    logOutUsecase: getIt(),
+      logOutUsecase: getIt(),
       signUpUseCase: getIt(),
       signInUseCase: getIt(),
       userStateUseCase: getIt(),
       appUserCubit: getIt()));
 }
 
-initBlogs() {
+initBlogs(Box blogsBox) {
   getIt
     ..registerFactory<BlogRemoteDataSource>(
         () => BlogRemoteDataSourceImpl(supabaseClient: getIt()))
@@ -79,6 +82,7 @@ initBlogs() {
         () => FetchBlogsUseCase(blogRepository: getIt()))
     ..registerFactory<UploadBlogUseCase>(
         () => UploadBlogUseCase(blogRepository: getIt()))
+    ..registerFactory<FavBlogUseCase>(()=> FavBlogUseCase(blogRepository: getIt()))
     ..registerLazySingleton<BlogBloc>(
-        () => BlogBloc(fetchBlogsUseCase: getIt(), uploadBlogUseCase: getIt()));
+        () => BlogBloc(fetchBlogsUseCase: getIt(), uploadBlogUseCase: getIt(), favBlogUseCase: getIt()));
 }

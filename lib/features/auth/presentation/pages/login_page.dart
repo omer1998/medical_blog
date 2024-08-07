@@ -56,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
             print("login user");
             print(state.user.name);
             BlocProvider.of<AppUserCubit>(context).updateUser(state.user);
+            
             GoRouter.of(context).goNamed("main");
           }
           // else if (state is AuthSuccess) {

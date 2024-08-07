@@ -1,3 +1,22 @@
-add update blog feature
-add cases features
+ 
 add medical calculation and drug doses
+
+add profile page --> saving user about section / speciality/ current institution/ profile image/ (with updating the database and saving user profile info in my local database)
+make the user able to update his profile info
+update user drawer to include follwing section (list tiles): 
+    my profile  
+    favorite cases
+    favorite blogs
+    my cases
+    my blogs
+    setting
+        change theme mode
+
+update tags to include all the unique tags saved in my database
+add images to cases and show these images on the view case page
+add update feature to cases 
+add comment section to cases and sebssequently apply this to blogs
+
+fix local storage for blogs
+adding chating feature between users
+refactor the design of blogs and cases card (retrieve idea from health 360)

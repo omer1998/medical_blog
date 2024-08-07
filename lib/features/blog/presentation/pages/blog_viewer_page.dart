@@ -2,18 +2,26 @@
 
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:medical_blog_app/core/network/connection_checker.dart';
+import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
+import 'package:medical_blog_app/core/common/widgets/loader.dart';
 import 'package:medical_blog_app/core/theme/app_pallete.dart';
 import 'package:medical_blog_app/core/utils/calculate_reading_time.dart';
 import 'package:medical_blog_app/core/utils/capitalize_first_letter.dart';
 import 'package:medical_blog_app/core/utils/check_connection.dart';
+import 'package:medical_blog_app/core/utils/favorite_blog_service.dart';
+import 'package:medical_blog_app/core/utils/show_snackbar.dart';
+import 'package:medical_blog_app/features/blog/controllers/blog_controllers.dart';
+import 'package:medical_blog_app/features/blog/data/repositories/riv_blog_repository.dart';
 
 import 'package:medical_blog_app/features/blog/domain/entities/blog_entity.dart';
+import 'package:medical_blog_app/features/blog/presentation/pages/bloc/blog_bloc.dart';
 
 class BlogViewerPage extends StatefulWidget {
   static route({required BlogEntity blog}) =>
@@ -30,27 +38,46 @@ class BlogViewerPage extends StatefulWidget {
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // final userId =
+    //     (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState)
+    //         .user
+    //         .id;
+    // BlocProvider.of<BlogBloc>(context, listen: false)
+    //     .add(GetFavBlogsEvent(userId: userId));
+  }
+
+  @override
   Widget build(BuildContext context) {
     // print("Author name inside blog viewer page");
-    // print(blog.authorName);
-     QuillController _qController;
-    if (widget.blog.content.startsWith('[{"insert":')){
-   _qController = QuillController(readOnly: true, document: Document.fromJson(jsonDecode(widget.blog.content)), selection: TextSelection.collapsed(offset: 0));
-
-    }else {
-       _qController = QuillController.basic();
+    // print(blog.authorName);.
+    final userId =
+        (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState)
+            .user
+            .id;
+    BlocProvider.of<BlogBloc>(context, listen: false);
+    QuillController _qController;
+    if (widget.blog.content.startsWith('[{"insert":')) {
+      _qController = QuillController(
+          readOnly: true,
+          document: Document.fromJson(jsonDecode(widget.blog.content)),
+          selection: TextSelection.collapsed(offset: 0));
+    } else {
+      _qController = QuillController.basic();
     }
 
-
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon:Icon(Icons.more_vert, color: AppPallete.gradient1,),
-            onPressed: () {},
-          )
-        ]
-      ),
+      appBar: AppBar(actions: [
+        IconButton(
+          icon: Icon(
+            Icons.more_vert,
+            color: AppPallete.gradient1,
+          ),
+          onPressed: () {},
+        )
+      ]),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Scrollbar(
@@ -58,12 +85,56 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.blog.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontSize: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.blog.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontSize: 24),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(onPressed: (){}, icon: Icon(Icons.message)),
+                        Consumer(builder:(context, ref, child) {
+                          // final isFav=   ;
+                           print("isFav");
+                          //  print(isFav.hasValue);
+                          final params = BlogParams({"userId" : userId, "blogId": widget.blog.id});
+                             return ref.watch(isFavoriteProvider.call(params)).when(
+                              data: (data){
+                                print("Data");
+                                print(data);
+                               return IconButton(
+                                 onPressed: () {
+                                   if (data) {
+                                     ref.read(blogControllerProvider).removeFavBlog(context, userId, widget.blog.id);
+                                   } else {
+                                     ref.read(blogControllerProvider).addFavBlog(context,userId, widget.blog.id);
+                                   }
+                                 },
+                                 icon: Icon(
+                                   data ? Icons.favorite : Icons.favorite_border,
+                                   color: data ? Colors.red : Colors.grey,
+                                 ),
+                               );
+                             }, 
+                             loading: (){
+                               return const Loader();
+                             
+                           }, error:(error, stackTrace) {
+                               showSnackBar(context, error.toString());
+                                return Container();
+                           },);
+                          }),
+                      ],
+                    )
+                    
+                  ],
                 ),
                 SizedBox(
                   height: 20,
@@ -188,11 +259,18 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 SizedBox(
                   height: 20,
                 ),
-                widget.blog.content.startsWith('[{"insert":') ? QuillEditor(configurations: QuillEditorConfigurations(enableInteractiveSelection: false, controller: _qController), focusNode: FocusNode(), scrollController: ScrollController(),) :
-                Text(
-                  widget.blog.content,
-                  style: TextStyle(fontSize: 16, height: 1.5),
-                )
+                widget.blog.content.startsWith('[{"insert":')
+                    ? QuillEditor(
+                        configurations: QuillEditorConfigurations(
+                            enableInteractiveSelection: false,
+                            controller: _qController),
+                        focusNode: FocusNode(),
+                        scrollController: ScrollController(),
+                      )
+                    : Text(
+                        widget.blog.content,
+                        style: TextStyle(fontSize: 16, height: 1.5),
+                      )
               ],
             ),
           ),
@@ -200,4 +278,14 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       ),
     );
   }
+}
+
+class BlogParams extends Equatable{
+  final Map<String, dynamic> params;
+  BlogParams(this.params);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => params.keys.toList();
+  
 }

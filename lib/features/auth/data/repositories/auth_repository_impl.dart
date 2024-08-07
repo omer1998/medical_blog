@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fpdart/src/either.dart';
 import 'package:medical_blog_app/core/constants/constant.dart';
+import 'package:medical_blog_app/core/profile_local_datasource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:medical_blog_app/core/entities/user.dart';
@@ -15,8 +16,10 @@ import '../../domain/repository/auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
   final ConnectionChecker connectionChecker;
+  final ProfileLocalDatasource profileLocalDatasource;
 
   AuthRepositoryImpl({
+    required this.profileLocalDatasource,
     required this.authRemoteDataSource,
     required this.connectionChecker,
   });
@@ -31,10 +34,15 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       final user =
           await authRemoteDataSource.logInWithEmailAndPassword(email, password);
+          await profileLocalDatasource.saveUser(user);
+          print("************** saving user info in local db");
       return right(user);
     } on ServerException catch (e) {
       return left(Failure(message: e.message));
+    } on LocalStorageException catch (e) {
+      return left(Failure(message: e.message));
     }
+  
   }
 
   @override
@@ -48,8 +56,12 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       final userModel = await authRemoteDataSource.signUpWithEmailAndPassword(
           name, email, password);
+          await profileLocalDatasource.saveUser(userModel);
+
       return right(userModel);
     } on ServerException catch (e) {
+      return left(Failure(message: e.message));
+    } on LocalStorageException catch(e){
       return left(Failure(message: e.message));
     }
   }
@@ -61,12 +73,18 @@ class AuthRepositoryImpl implements AuthRepository {
         print("----- ? true");
         final session = authRemoteDataSource.userSession;
         if (session != null) {
-          return right(UserEntity(
-              name:  "", email: session.user.email ?? "", id: session.user.id));
+          final user = await profileLocalDatasource.getUser();
+          return right(user);
+          // return right(UserEntity(
+          //     name:  "", email: session.user.email ?? "", id: session.user.id));
         }
         return left(Failure(message: Constants.errorConnectionMessage));
       }
       final user = await authRemoteDataSource.getUser();
+      if (user != null){
+      await profileLocalDatasource.saveUser(user);
+        
+      }
       if (user != null) {
         return right(user);
       } else {
@@ -74,7 +92,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     } on ServerException catch (e) {
       return left(Failure(message: e.message));
+    } on LocalStorageException catch(e){
+      return left(Failure(message: e.message));
     }
+  
   }
   
   @override

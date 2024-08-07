@@ -20,3 +20,16 @@ final class BlogFailureState extends BlogState {
 
   BlogFailureState({required this.message});
 }
+
+final class FavBlogSuccessState extends BlogState {}
+final class FavBlogFailureState extends BlogState {
+  final String message;
+
+  FavBlogFailureState({required this.message});
+}
+final class FavBlogLoadingState extends BlogState {}
+final class AllBlogFavSuccessState extends BlogState {
+  final List<BlogEntity> blogs;
+
+  AllBlogFavSuccessState({required this.blogs});
+}

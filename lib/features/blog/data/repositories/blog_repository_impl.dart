@@ -76,4 +76,33 @@ class BlogRepositoryImpl implements BlogRepository {
       return left(Failure(message: e.message));
     }
   }
+  
+  @override
+  Future<Either<Failure, void>> favBlog({required String blogId, required String userId})async {
+    try {
+     await blogRemoteDataSource.favBlog(userId, blogId);
+      return right(null); 
+    } catch (e) {
+      return left(Failure(message: e.toString()));
+    }
+  }
+
+  // @override
+  // Future<Either<Failure, void>> unFavBlog({required String blogId, required String userId})async {
+  //   try {
+  //     await blogRemoteDataSource.unFavBlog(userId, blogId);
+  //     return right(null); 
+  //   } catch (e) {
+  //     return left(Failure(message: e.toString()));
+  //   }
+  // }
+
+  // @override
+  // Future<Either<Failure, List<BlogEntity>>> fetchFavBlogs({required String userId})async {
+  //   try {
+  //     if (!await connectionChecker.isConnected) {
+        
+  //     }
+  //   }
+  // }
 }

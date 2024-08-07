@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/core/common/widgets/loader.dart';
 import 'package:medical_blog_app/core/theme/app_pallete.dart';
 import 'package:medical_blog_app/core/utils/show_snackbar.dart';
+import 'package:medical_blog_app/features/auth/data/models/user_model.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/blog/data/datasources/remote_data_source.dart';
@@ -20,7 +22,8 @@ import 'package:medical_blog_app/init_dependencies.dart';
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 class BlogPage extends StatefulWidget {
-  static route() => MaterialPageRoute(builder: (context) => const BlogPage());
+  // static route() => MaterialPageRoute(builder: (context) => const BlogPage());
+
   const BlogPage({super.key});
 
   @override
@@ -38,7 +41,6 @@ class _BlogPageState extends State<BlogPage> {
   //   MedCalcPage(),
   //   CasesPage()
   // ];
- 
 
   @override
   Widget build(BuildContext context) {
@@ -49,16 +51,18 @@ class _BlogPageState extends State<BlogPage> {
           leading: Padding(
             padding: const EdgeInsets.all(5.0),
             child: CircleAvatar(
-              radius: 5,
-              backgroundColor: Colors.white,
-              child: IconButton(
-                onPressed: () {
-                  _scaffoldKey.currentState?.openDrawer();
-                },
-                icon: Icon(Icons.person),
-                color: Colors.black,
-              ),
-            ),
+                radius: 5,
+                
+                child: IconButton(
+                  onPressed: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                  icon: Icon(Icons.person),
+                  color: Colors.black,
+                ),
+              
+                ),
+          
           ),
           centerTitle: true,
           title: Text(
@@ -72,7 +76,7 @@ class _BlogPageState extends State<BlogPage> {
                 icon: Icon(CupertinoIcons.add_circled))
           ],
         ),
-drawer: ProfileDrawer(),
+        drawer: ProfileDrawer(),
         body: Container(
           child: MultiBlocListener(
             listeners: [
@@ -85,7 +89,6 @@ drawer: ProfileDrawer(),
               ),
             ],
             child: BlocConsumer<BlogBloc, BlogState>(
-              
               builder: (context, state) {
                 if (state is BlogLoadingState) {
                   return Loader();
@@ -105,7 +108,13 @@ drawer: ProfileDrawer(),
                   );
                 }
                 return Center(child: Container());
-              }, listener: (BuildContext context, BlogState state) {  },
+              },
+              listener: (BuildContext context, BlogState state) {
+                if (state is BlogFailureState){
+                  print(state.message);
+                  showSnackBar(context, state.message);
+                }
+              },
             ),
           ),
         ));

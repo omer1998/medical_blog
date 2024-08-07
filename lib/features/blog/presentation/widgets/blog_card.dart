@@ -37,6 +37,7 @@ class BlogCard extends StatelessWidget {
           child: Container(
               height: 200,
               decoration: BoxDecoration(
+                // gradient: LinearGradient(colors: [backGroundColor, const Color.fromARGB(255, 240, 6, 6)]),
                   color: backGroundColor,
                   borderRadius: const BorderRadius.all(Radius.circular(10))),
               child: Padding(

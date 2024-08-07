@@ -27,7 +27,7 @@ class CaseIvx {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      // 'id': id,
+      'id': id,
       'inv_data': inv_data,
       'inv_imgs': inv_imgs,
     };
@@ -37,7 +37,7 @@ class CaseIvx {
     return CaseIvx(
       id: map['id'] as String,
       inv_data: map['inv_data'] as String,
-      inv_imgs: map["inv_imgs"] != null ? List<String>.from((map['inv_imgs'] as List<dynamic>)) : <String>[]
+      inv_imgs: map["inv_imgs"] != null && map['inv_imgs'].isNotEmpty ? List<String>.from((map['inv_imgs'] as List<dynamic>)) : <String>[]
     );
   }
 
