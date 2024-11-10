@@ -39,7 +39,7 @@ class _BlogPageState extends ConsumerState<BlogPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(availableTopicsProvider);
+   
     BlocProvider.of<BlogBloc>(context).add(BlogFetchBlogsEvent());
   }
 
@@ -123,32 +123,31 @@ class _BlogPageState extends ConsumerState<BlogPage> {
                       print(blog);
                     }
                   }
+                  final allTopics = state.availableTopics;
 
                   return Column(
                     children: [
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: ref.watch(availableTopicsProvider).map((topic) {
-                            final isSelected = state.selectedTopic == topic;
-                            return Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: ActionChip(
-                                label: Text(topic),
-                                backgroundColor: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                                onPressed: () {
-                                  BlocProvider.of<BlogBloc>(context).add(
-                                      BlogFilterByTopicEvent(isSelected ? null : topic));
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                      Wrap(
+                        children: allTopics.map((topic) {
+                          final isSelected = state.selectedTopic == topic;
+                          return Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: ActionChip(
+                              label: Text(topic),
+                              backgroundColor: isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : null,
+                              onPressed: () {
+                                BlocProvider.of<BlogBloc>(context).add(
+                                    BlogFilterByTopicEvent(isSelected ? null : topic));
+                              },
+                            ),
+                          );
+                        }).toList(),
                       ),
                       Expanded(
                         child: ListView.builder(
+                          
                           itemCount: state.blogs.length,
                           itemBuilder: (context, index) {
                             return NewBlogCard(
@@ -175,10 +174,11 @@ class _BlogPageState extends ConsumerState<BlogPage> {
   }
 }
 
-final availableTopicsProvider = Provider<List<String>>((ref) {
-  final blogState = ref.watch(blogBlocProvider);
-  if (blogState is BlogsSuccessState) {
-    return blogState.availableTopics;
-  }
-  return [];
-});
+// final availableTopicsProvider = Provider<List<String>>((ref) {
+//   BlocProvider.of<BlogBloc>(context);
+//   if (blogState is BlogsSuccessState) {
+//     return blogState.availableTopics;
+//   }
+//   return [];
+// });
+
