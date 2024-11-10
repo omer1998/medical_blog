@@ -8,14 +8,23 @@ class CommentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(comment.authorImg),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(comment.authorImg),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(comment.authorName, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(comment.timestamp.toString(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
+          subtitle: Text(comment.content),
+        ),
       ),
-      title: Text(comment.authorName, style: TextStyle(fontSize: 12),),
-      
-      subtitle: Text(comment.content, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
     );
   }
-
-  }
+}
