@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,25 +14,29 @@ import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecas
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/blog/data/datasources/remote_data_source.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/add_new_blog_page.dart';
+import 'package:medical_blog_app/features/blog/presentation/pages/add_new_blog_page_section.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/bloc/blog_bloc.dart';
 import 'package:medical_blog_app/features/blog/presentation/pages/profile_drawer.dart';
 import 'package:medical_blog_app/features/blog/presentation/widgets/blog_card.dart';
+import 'package:medical_blog_app/features/blog/presentation/widgets/blog_search_delegate.dart';
+import 'package:medical_blog_app/features/blog/presentation/widgets/new_blog_card.dart';
 import 'package:medical_blog_app/features/case/pages/cases_page.dart';
 import 'package:medical_blog_app/features/med_calc/med_calc_page.dart';
 import 'package:medical_blog_app/init_dependencies.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-class BlogPage extends StatefulWidget {
+
+class BlogPage extends ConsumerStatefulWidget {
   // static route() => MaterialPageRoute(builder: (context) => const BlogPage());
 
   const BlogPage({super.key});
 
   @override
-  State<BlogPage> createState() => _BlogPageState();
+   ConsumerState<ConsumerStatefulWidget> createState() => _BlogPageState();
 }
 
-class _BlogPageState extends State<BlogPage> {
+class _BlogPageState extends ConsumerState<BlogPage> {
   @override
   void initState() {
     super.initState();
@@ -44,25 +50,37 @@ class _BlogPageState extends State<BlogPage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    final userId =
+        (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState)
+            .user
+            .id;
+    final user =
+        (BlocProvider.of<AppUserCubit>(context).state as UserLoggedInState).user;
+
     return Scaffold(
         // bottomNavigationBar: ,
         key: _scaffoldKey,
         appBar: AppBar(
           leading: Padding(
             padding: const EdgeInsets.all(5.0),
-            child: CircleAvatar(
+            child: InkWell(
+              onTap: () {
+                _scaffoldKey.currentState?.openDrawer();
+              },
+              child: CircleAvatar(
                 radius: 5,
-                
-                child: IconButton(
-                  onPressed: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                  icon: Icon(Icons.person),
-                  color: Colors.black,
-                ),
-              
-                ),
-          
+                backgroundImage: NetworkImage(user.img_url!),
+
+                // child: IconButton(
+                //   onPressed: () {
+                //     _scaffoldKey.currentState?.openDrawer();
+                //   },
+                //   icon: Image.network(user.user.img_url!),
+                //   color: Colors.black,
+                // ),
+              ),
+            ),
           ),
           centerTitle: true,
           title: Text(
@@ -71,13 +89,24 @@ class _BlogPageState extends State<BlogPage> {
           actions: [
             IconButton(
                 onPressed: () {
-                  Navigator.push(context, AddNewBlogPage.route());
+                  // Navigator.push(context, AddNewBlogPage.route());
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return AddNewBlogSection(
+                        userId: userId,
+                      );
+                    },
+                  ));
                 },
-                icon: Icon(CupertinoIcons.add_circled))
+                icon: Icon(CupertinoIcons.add_circled)),
+                IconButton(onPressed: (){
+                  showSearch(context: context, delegate: BlogSearchDelegate(mainAppUser: user));
+                }, icon: Icon(Icons.search))
           ],
         ),
-        drawer: ProfileDrawer(),
+        drawer: ProfileDrawer(user: user),
         body: Container(
+          // decoration: BoxDecoration(color:  Color.fromARGB(255, 56, 2, 55)),
           child: MultiBlocListener(
             listeners: [
               BlocListener<AuthBloc, AuthState>(
@@ -93,16 +122,24 @@ class _BlogPageState extends State<BlogPage> {
                 if (state is BlogLoadingState) {
                   return Loader();
                 } else if (state is BlogsSuccessState) {
+                  // print("all blogs : ${state.blogs}");
+                  for (var blog in state.blogs) {
+                    if (blog.contentJson != null) {
+                      print(blog);
+                    }
+                  }
+
                   return ListView.builder(
                     itemCount: state.blogs.length,
                     itemBuilder: (context, index) {
-                      return BlogCard(
-                        backGroundColor: index % 3 == 0
-                            ? AppPallete.gradient1
-                            : index % 2 == 0
-                                ? AppPallete.gradient2
-                                : AppPallete.gradient3,
+                      return NewBlogCard(
+                        // backGroundColor: index % 3 == 0
+                        //     ? AppPallete.gradient1
+                        //     : index % 2 == 0
+                        //         ? AppPallete.gradient2
+                        //         : AppPallete.gradient3,
                         blog: state.blogs[index],
+                        mainAppUser: user
                       );
                     },
                   );
@@ -110,7 +147,7 @@ class _BlogPageState extends State<BlogPage> {
                 return Center(child: Container());
               },
               listener: (BuildContext context, BlogState state) {
-                if (state is BlogFailureState){
+                if (state is BlogFailureState) {
                   print(state.message);
                   showSnackBar(context, state.message);
                 }
