@@ -21,6 +21,12 @@ final class BlogUploadBlogEvent extends BlogEvent {
 
 final class BlogFetchBlogsEvent extends BlogEvent {}
 
+final class BlogFilterByTopicEvent extends BlogEvent {
+  final String? selectedTopic;
+
+  BlogFilterByTopicEvent(this.selectedTopic);
+}
+
 final class FavBlogEvent extends BlogEvent{
   final String blogId;
   final String userId;

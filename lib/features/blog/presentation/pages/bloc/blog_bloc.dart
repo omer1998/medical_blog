@@ -12,6 +12,8 @@ import 'package:medical_blog_app/features/blog/domain/entities/blog_entity.dart'
 import 'package:medical_blog_app/features/blog/domain/usecases/fetch_blogs_usecase.dart';
 import 'package:medical_blog_app/features/blog/domain/usecases/upload_blog_usecase.dart';
 
+
+
 part 'blog_event.dart';
 part 'blog_state.dart';
 
@@ -19,15 +21,13 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
   final UploadBlogUseCase uploadBlogUseCase;
   final FetchBlogsUseCase fetchBlogsUseCase;
   final FavBlogUseCase favBlogUseCase;
+  List<BlogEntity> allBlogs = [];
 
   BlogBloc({
     required this.favBlogUseCase,
     required this.uploadBlogUseCase,
     required this.fetchBlogsUseCase,
   }) : super(BlogInitial()) {
-    // on<BlogEvent>((event, emit) {
-    //   emit(BlogLoadingState());
-    // });
 
     on<FavBlogEvent>((event, emit)async {
       emit(FavBlogLoadingState());
@@ -39,11 +39,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       });
       
     },);
-    // on<GetFavBlogsEvent>((event, emit) {
-    //   emit(FavBlogSuccessState());
 
-
-    // },);
     on<BlogUploadBlogEvent>(
       (event, emit) async {
         emit(BlogLoadingState());
@@ -65,11 +61,21 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
 
         final response = await fetchBlogsUseCase(NoParams());
         response.fold((l) => emit(BlogFailureState(message: l.message)), (r) {
-          print("nnnn");
-          print(r);
-          emit(BlogsSuccessState(blogs: r));
+          allBlogs = r;
+          emit(BlogsSuccessState(blogs: r , selectedTopic: null));
         });
       },
     );
+        on<BlogFilterByTopicEvent>((event, emit) {
+      final selectedTopic = event.selectedTopic;
+      if (selectedTopic == null) {
+        emit(BlogsSuccessState(blogs: allBlogs, selectedTopic: selectedTopic));
+      } else {
+        final filteredBlogs = allBlogs
+            .where((blog) => blog.topics.contains(selectedTopic))
+            .toList();
+        emit(BlogsSuccessState(blogs: filteredBlogs, selectedTopic: selectedTopic));
+      }
+    });
   }
 }

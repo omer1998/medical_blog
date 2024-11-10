@@ -24,29 +24,24 @@ import 'package:medical_blog_app/features/case/pages/cases_page.dart';
 import 'package:medical_blog_app/features/med_calc/med_calc_page.dart';
 import 'package:medical_blog_app/init_dependencies.dart';
 
+
+
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
 class BlogPage extends ConsumerStatefulWidget {
-  // static route() => MaterialPageRoute(builder: (context) => const BlogPage());
-
   const BlogPage({super.key});
 
   @override
-   ConsumerState<ConsumerStatefulWidget> createState() => _BlogPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _BlogPageState();
 }
 
 class _BlogPageState extends ConsumerState<BlogPage> {
   @override
   void initState() {
     super.initState();
+    ref.read(availableTopicsProvider);
     BlocProvider.of<BlogBloc>(context).add(BlogFetchBlogsEvent());
   }
-  // final pages = [
-
-  //   MedCalcPage(),
-  //   CasesPage()
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -129,19 +124,41 @@ class _BlogPageState extends ConsumerState<BlogPage> {
                     }
                   }
 
-                  return ListView.builder(
-                    itemCount: state.blogs.length,
-                    itemBuilder: (context, index) {
-                      return NewBlogCard(
-                        // backGroundColor: index % 3 == 0
-                        //     ? AppPallete.gradient1
-                        //     : index % 2 == 0
-                        //         ? AppPallete.gradient2
-                        //         : AppPallete.gradient3,
-                        blog: state.blogs[index],
-                        mainAppUser: user
-                      );
-                    },
+                  return Column(
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: ref.watch(availableTopicsProvider).map((topic) {
+                            final isSelected = state.selectedTopic == topic;
+                            return Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: ActionChip(
+                                label: Text(topic),
+                                backgroundColor: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
+                                onPressed: () {
+                                  BlocProvider.of<BlogBloc>(context).add(
+                                      BlogFilterByTopicEvent(isSelected ? null : topic));
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.blogs.length,
+                          itemBuilder: (context, index) {
+                            return NewBlogCard(
+                              blog: state.blogs[index],
+                              mainAppUser: user,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   );
                 }
                 return Center(child: Container());
@@ -157,3 +174,7 @@ class _BlogPageState extends ConsumerState<BlogPage> {
         ));
   }
 }
+
+final availableTopicsProvider = Provider<List<String>>((ref) {
+  return ['Cardiology', 'Neurology', 'Oncology', 'Pediatrics', 'General Health'];
+});
