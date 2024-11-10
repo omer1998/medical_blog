@@ -128,21 +128,22 @@ class _BlogPageState extends ConsumerState<BlogPage> {
                   return Column(
                     children: [
                       Wrap(
-                        spacing: 4.0, // add some spacing between chips
-                        children: allTopics.map((topic) {
+                        spacing: 5.0, // add some spacing between chips
+                        children: [...allTopics,].map((topic) {
                           final isSelected = state.selectedTopic == topic;
-                          return Chip(
+                          return ActionChip(
                             label: Text(topic),
                             backgroundColor: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey[200], // change background color
+                                ? AppPallete.gradient1
+                                : Colors.black, // change background color
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                               side: isSelected
-                                  ? BorderSide(color: Theme.of(context).colorScheme.primary)
+                                  ? BorderSide.none
                                   : BorderSide.none,
                             ),
                             onPressed: () {
+                              print(isSelected);
                               BlocProvider.of<BlogBloc>(context).add(
                                   BlogFilterByTopicEvent(isSelected ? null : topic));
                             },
