@@ -35,14 +35,10 @@ class _MedCalcPageState extends ConsumerState<MedCalcPage> {
       appBar: AppBar(
         title: const Text('MedCalc'),
       ),
-      body: ListView(
-        children: [
-          ListTile(title: Text("BMI Calculator")),
-          ListTile(title: Text("Ideal Body Weight Calculator")),
-          ListTile(title: Text("Body Surface Area Calculator")),
-          ListTile(title: Text("Creatinine Clearance Calculator")),
-          ListTile(title: Text("Glasgow Coma Scale Calculator")),
-        ],
+      body: WebView(
+        onWebViewCreated: (WebViewController webViewController) {
+          webViewController.loadUrl('https://www.mdcalc.com/calc/43/creatinine-clearance-cockcroft-gault-equation');
+        },
       ),
     );
   }
