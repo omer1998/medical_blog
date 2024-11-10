@@ -8,8 +8,8 @@ class MedCalcPage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _MedCalcPageState();
 }
 class _MedCalcPageState extends ConsumerState<MedCalcPage> {
-  late final WebViewController webViewController;
-  
+  late WebViewController? webViewController;
+
   @override
   void initState() {
     super.initState();
@@ -32,8 +32,7 @@ class _MedCalcPageState extends ConsumerState<MedCalcPage> {
             return NavigationDecision.navigate;
           },
         ),
-      )
-      ..loadRequest(Uri.parse("https://www.mdcalc.com/calc/43/creatinine-clearance-cockcroft-gault-equation"));
+      );
   }
   @override
   Widget build(BuildContext context) {
