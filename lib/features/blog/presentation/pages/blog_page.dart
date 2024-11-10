@@ -127,28 +127,34 @@ class _BlogPageState extends ConsumerState<BlogPage> {
 
                   return Column(
                     children: [
-                      Wrap(
-                        spacing: 5.0, // add some spacing between chips
-                        children: [...allTopics,].map((topic) {
-                          final isSelected = state.selectedTopic == topic;
-                          return ActionChip(
-                            label: Text(topic),
-                            backgroundColor: isSelected
-                                ? AppPallete.gradient1
-                                : Colors.black, // change background color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              side: isSelected
-                                  ? BorderSide.none
-                                  : BorderSide.none,
-                            ),
-                            onPressed: () {
-                              print(isSelected);
-                              BlocProvider.of<BlogBloc>(context).add(
-                                  BlogFilterByTopicEvent(isSelected ? null : topic));
-                            },
-                          );
-                        }).toList(),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                           // add some spacing between chips
+                          children: [...allTopics,].map((topic) {
+                            final isSelected = state.selectedTopic == topic;
+                            return Padding(
+                              padding: const EdgeInsets.only(right:8.0),
+                              child: ActionChip(
+                                label: Text(topic),
+                                backgroundColor: isSelected
+                                    ? AppPallete.gradient1
+                                    : Colors.black, // change background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  side: isSelected
+                                      ? BorderSide.none
+                                      : BorderSide.none,
+                                ),
+                                onPressed: () {
+                                  print(isSelected);
+                                  BlocProvider.of<BlogBloc>(context).add(
+                                      BlogFilterByTopicEvent(isSelected ? null : topic));
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       Expanded(
                         child: ListView.builder(
