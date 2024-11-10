@@ -8,8 +8,10 @@ final class BlogInitial extends BlogState {}
 final class BlogsSuccessState extends BlogState {
   final List<BlogEntity> blogs;
   final String? selectedTopic;
+  final List<String> availableTopics;
 
-  BlogsSuccessState({required this.blogs, this.selectedTopic});
+
+  BlogsSuccessState({required this.blogs, this.selectedTopic, required this.availableTopics});
 }
 
 final class BlogSuccessState extends BlogState {}

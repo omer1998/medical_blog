@@ -62,20 +62,25 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
         final response = await fetchBlogsUseCase(NoParams());
         response.fold((l) => emit(BlogFailureState(message: l.message)), (r) {
           allBlogs = r;
-          emit(BlogsSuccessState(blogs: r , selectedTopic: null));
+          final availableTopics = r.map((blog) => blog.topics).expand((topics) => topics).toSet().toList();
+          emit(BlogsSuccessState(blogs: r , selectedTopic: null, availableTopics: availableTopics));
         });
       },
     );
         on<BlogFilterByTopicEvent>((event, emit) {
-      final selectedTopic = event.selectedTopic;
+      if (state is BlogsSuccessState){
+        final currentState = state as BlogsSuccessState;
+        final selectedTopic = event.selectedTopic;
       if (selectedTopic == null) {
-        emit(BlogsSuccessState(blogs: allBlogs, selectedTopic: selectedTopic));
+        emit(BlogsSuccessState(blogs: allBlogs, selectedTopic: selectedTopic, availableTopics: currentState.availableTopics));
       } else {
         final filteredBlogs = allBlogs
             .where((blog) => blog.topics.contains(selectedTopic))
             .toList();
-        emit(BlogsSuccessState(blogs: filteredBlogs, selectedTopic: selectedTopic));
+        emit(BlogsSuccessState(blogs: filteredBlogs, selectedTopic: selectedTopic, availableTopics: currentState.availableTopics));
       }
+      }
+      
     });
   }
 }

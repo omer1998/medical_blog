@@ -176,5 +176,9 @@ class _BlogPageState extends ConsumerState<BlogPage> {
 }
 
 final availableTopicsProvider = Provider<List<String>>((ref) {
-  return ['Cardiology', 'Neurology', 'Oncology', 'Pediatrics', 'General Health'];
+  final blogState = ref.watch(blogBlocProvider);
+  if (blogState is BlogsSuccessState) {
+    return blogState.availableTopics;
+  }
+  return [];
 });
