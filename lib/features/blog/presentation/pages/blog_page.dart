@@ -142,14 +142,15 @@ class _BlogPageState extends ConsumerState<BlogPage> {
                                     : Colors.black, // change background color
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
-                                  side: isSelected
-                                      ? BorderSide.none
-                                      : BorderSide.none,
+                                  side: BorderSide.none,
                                 ),
                                 onPressed: () {
-                                  print(isSelected);
-                                  BlocProvider.of<BlogBloc>(context).add(
-                                      BlogFilterByTopicEvent(isSelected ? null : topic));
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MedCalcPage(topic: topic),
+                                    ),
+                                  );
                                 },
                               ),
                             );
