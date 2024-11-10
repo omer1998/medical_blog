@@ -35,9 +35,14 @@ class _MedCalcPageState extends ConsumerState<MedCalcPage> {
       appBar: AppBar(
         title: const Text('MedCalc'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: WebViewWidget(controller: webViewController),
+      body: ListView(
+        children: [
+          ListTile(title: Text("BMI Calculator")),
+          ListTile(title: Text("Ideal Body Weight Calculator")),
+          ListTile(title: Text("Body Surface Area Calculator")),
+          ListTile(title: Text("Creatinine Clearance Calculator")),
+          ListTile(title: Text("Glasgow Coma Scale Calculator")),
+        ],
       ),
     );
   }
