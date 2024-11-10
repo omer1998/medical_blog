@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:medical_blog_app/features/comment/models/comment_model.dart';
 
 class CommentItem extends StatelessWidget {
@@ -19,7 +20,7 @@ class CommentItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(comment.authorName, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(comment.createdAt.toString(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(DateFormat.yMMMd().add_jm().format(comment.createdAt), style: const TextStyle(fontSize: 12, color: Colors.grey)),
             ],
           ),
           subtitle: Text(comment.content),
