@@ -19,7 +19,7 @@ class CommentItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(comment.authorName, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(comment.timestamp.toString(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(comment.createdAt.toString(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
             ],
           ),
           subtitle: Text(comment.content),
