@@ -11,7 +11,9 @@ final supabaseClientProvider = Provider<SupabaseClient>((ref) {
  return  Supabase.instance.client;
 });
 
-
+final supabaseStorageClientProvider = Provider<SupabaseStorageClient>((ref) {
+  return Supabase.instance.client.storage;
+});
 
 
 

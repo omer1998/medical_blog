@@ -1,8 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:medical_blog_app/core/providers/provider.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:medical_blog_app/core/entities/user.dart';
+import 'package:medical_blog_app/core/error/failures.dart';
+import 'package:medical_blog_app/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:medical_blog_app/core/error/exceptions.dart';
@@ -16,6 +17,7 @@ abstract interface class AuthRemoteDataSource {
       String name, String email, String password);
   Future<UserModel> logInWithEmailAndPassword(String email, String password);
   Future<void> logOut();
+   Future<Either<Failure, UserEntity>> updateProfile(UpdateProfileParams params);
 }
 
 // final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
@@ -67,14 +69,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       String name, String email, String password) async {
     try {
       final res = await supabaseClient.auth
-          .signUp(email: email, password: password, data: {"name": name});
+          .signUp(email: email, password: password, data: {"name": name,});
       if (res.user == null) {
         throw ServerException("User is NULL");
       }
+      print("res: ${res.user!.toJson()}");
       return UserModel.fromJson(res.user!.toJson());
     } on AuthException catch (e) {
       throw ServerException(e.message);
     } catch (e) {
+      print("err in sign up : ${e.toString()}");
       throw ServerException(e.toString());
     }
   }
@@ -119,6 +123,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return await supabaseClient.auth.signOut();
     } on AuthException catch (e) {
       throw ServerException(e.message);
+    }
+  }
+  
+  @override
+  Future<Either<Failure, UserEntity>> updateProfile(UpdateProfileParams params) async {
+    try {
+      // first upload image and get its url
+      final imageName = "${params.name}${DateTime.now().millisecondsSinceEpoch}";
+      await supabaseClient.storage.from("avatars").upload(imageName, params.imageFile);
+      final img_url = supabaseClient.storage.from("avatars").getPublicUrl(imageName);
+      final res = await supabaseClient.from("profiles").update({"img_url": img_url, 
+        "title": params.title, "about": params.about, "specialization": params.specialization, "institution": params.institution, "expertise": params.expertise}).eq("id", userSession!.user.id).select();      
+      // need to add current position
+      print("image url: $img_url");
+      print("res: ${res}");
+      print(res.first);
+      final user = UserModel.fromJson(res.first);
+      return right(user);
+    } catch (e) {
+      return left(Failure(message: e.toString()));
     }
   }
 }

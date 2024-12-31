@@ -6,59 +6,65 @@ import 'package:medical_blog_app/features/case/pages/widgets/case_seg_title.dart
 final selectedTagsProvider = StateProvider<List<String>>((ref) {
   return [] ;
 });
-class TopicTags extends StatefulWidget {
+
+class TopicTags extends ConsumerStatefulWidget {
   final List<String> tags;
   const TopicTags({super.key, required this.tags});
-
   @override
-  State<TopicTags> createState() => _TopicTagsState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _TopicTagsState();
 }
+class _TopicTagsState extends ConsumerState<TopicTags> {
 
-class _TopicTagsState extends State<TopicTags> {
-  final TextEditingController tagController = TextEditingController();
+    final TextEditingController tagController = TextEditingController();
   List<String> selectedTopics = [];
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return  Column(
       children: [
-        SizedBox(
-        height: 180,
-        child: GridView.count(
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 0,
-            crossAxisCount: 3,
-            childAspectRatio: 3 / 1,
+        Wrap(
+            spacing: 10,
             children: widget.tags
-                .map((e) => GestureDetector(
-                    onTap: () => {
-                          if (!selectedTopics.contains(e))
-                            {
-                              selectedTopics.add(e),
-                            }
-                          else
-                            {
-                              selectedTopics.remove(e),
-                            },
-                          setState(() {}),
-                          Consumer( builder: (context, ref, child) {
-                            ref.read(selectedTagsProvider.notifier).state = selectedTopics;
-                            return Container();
-                          }),
-                          print(selectedTopics)
-                        },
-                    child: Chip(
-                        side: selectedTopics.contains(e)
-                            ? BorderSide.none
-                            : BorderSide(color: AppPallete.borderColor),
-                        backgroundColor: selectedTopics.contains(e)
+                .map((e) => FilterChip(
+                    /* side: selectedTopics.contains(e)
+                        ? BorderSide.none
+                        : BorderSide(color: AppPallete.borderColor),
+                    backgroundColor: selectedTopics.contains(e)
+                        ? AppPallete.gradient1
+                        : null, */
+                        selected: selectedTopics.contains(e),
+                    selectedColor: AppPallete.gradient1.withOpacity(0.2),
+                    label: Text(e),
+                    labelStyle: TextStyle(
+                      color: selectedTopics.contains(e)
+                          ? AppPallete.gradient1
+                          : AppPallete.whiteColor,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: selectedTopics.contains(e)
                             ? AppPallete.gradient1
-                            : null,
-                        clipBehavior: Clip.antiAlias,
-                        label: Text(e))))
+                            : AppPallete.borderColor,
+                      ),
+                     
+                    ),
+                    onSelected: (bool value) { 
+                      if (!selectedTopics.contains(e))
+                        {
+                          selectedTopics.add(e);
+                          
+                        }
+                      else
+                        {
+                          selectedTopics.remove(e);
+                               
+                        }
+                              return setState(() {
+                    ref.read(selectedTagsProvider.notifier).state= selectedTopics;
+                      
+                    });
+                     },))
                 .toList()),
-
-                
-      ),
       SizedBox(height: 10,),
       ActionChip(label: Text("Add Tag"), onPressed:() async {
         await showModalBottomSheet(
@@ -128,3 +134,19 @@ class _TopicTagsState extends State<TopicTags> {
           );
   }
 }
+// class TopicTags extends StatefulWidget {
+//   final List<String> tags;
+//   const TopicTags({super.key, required this.tags});
+
+//   @override
+//   State<TopicTags> createState() => _TopicTagsState();
+// }
+
+// class _TopicTagsState extends State<TopicTags> {
+//   final TextEditingController tagController = TextEditingController();
+//   List<String> selectedTopics = [];
+//   @override
+//   Widget build(BuildContext context) {
+    
+//   }
+// }

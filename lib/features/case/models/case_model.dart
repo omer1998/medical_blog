@@ -20,6 +20,8 @@ class MyCase {
   final String case_name;
   final String case_author;
   final String created_at;
+  final bool structured;
+  final String? case_detail;
   final String? name;
   final List<String>? tags;
   final CaseIvx? caseIvx;
@@ -29,6 +31,8 @@ class MyCase {
     required this.case_name,
     required this.case_author,
     required this.created_at,
+    required this.structured,
+     this.case_detail,
     this.name,
     this.tags,
     this.caseIvx,
@@ -44,15 +48,20 @@ class MyCase {
     String? case_author,
     String? created_at,
     String? name,
+    
     List<String>? tags,
     CaseIvx? caseIvx,
     CaseInfo? caseInfo,
-    String? id
+    String? id,
+    String? case_detail,
+    bool? structured
   }) {
     return MyCase(
+      structured: structured ?? this.structured,
       case_name: case_name ?? this.case_name,
       case_author: case_author ?? this.case_author,
       created_at: created_at ?? this.created_at,
+      case_detail: case_detail ?? this.case_detail,
       name: name ?? this.name,
       tags: tags ?? this.tags,
       caseIvx: caseIvx ?? this.caseIvx,
@@ -71,6 +80,8 @@ class MyCase {
       'caseInfo': caseInfo?.toMap(),
       "id": id,
       "name": name,
+      "case_detail": case_detail,
+      "structured": structured
  
     };
   }
@@ -78,11 +89,13 @@ class MyCase {
   factory MyCase.fromMap(Map<String, dynamic> map) {
     return MyCase(
       id: map["id"] as String,
+      structured: map["structured"] as bool,
       case_name: map['case_name'] as String,
       case_author: map['case_author'] as String,
       created_at: map['created_at'] as String,
+      case_detail: map['case_detail'] != null ? map['case_detail'] as String : null,
       tags: map['tags'] != null ? List<String>.from((map['tags'] as List<dynamic>)) : null,
-      name: map['profiles']["name"] != null ? map['profiles']["name"] as String : null,
+      name: map['profiles'] != null && map['profiles']["name"] != null ? map['profiles']["name"] as String : null,
       caseInfo: map['cases_infos'] != null ? CaseInfo.fromMap(map['cases_infos'][0]) : null,
       caseIvx: map['cases_invs'] != null ? CaseIvx.fromMap(map['cases_invs'][0]) : null
       );
@@ -90,11 +103,13 @@ class MyCase {
 
   factory MyCase.fromMapLocalDB(Map<String, dynamic> map) {
     return MyCase(
+      structured: map["structured"] as bool,
       id: map["id"] as String,
       name: map["name"],
       case_name: map['case_name'] as String,
       case_author: map['case_author'] as String,
       created_at: map['created_at'] as String,
+      case_detail: map['case_detail'] != null ? map['case_detail'] as String : null,
       tags: map['tags'] != null ? List<String>.from((map['tags'] as List<dynamic>)) : null,
       caseInfo: map['caseInfo'] != null ? CaseInfo.fromMap((map['caseInfo'] as Map<dynamic, dynamic>).map((key, value) {
           return MapEntry(key.toString(), value);
@@ -154,8 +169,11 @@ class MyCase {
   final String managementPlan;
   final String ddx;
   final String? ivx;
+  final List<String>? tags;
+  
   // final String authorName;
   Case({
+    required this.tags,
     required this.id,
     required this.caseName,
     required this.caseAuthorId,
@@ -193,8 +211,10 @@ class MyCase {
     String? managementPlan,
     String? ddx,
     String? ivx,
+    List<String>? tags
   }) {
     return Case(
+      tags: tags ?? this.tags,
       id: id ?? this.id,
       caseName: caseName ?? this.caseName,
       caseAuthorId: caseAuthorId ?? this.caseAuthorId,
@@ -236,6 +256,7 @@ class MyCase {
       'management_plan': managementPlan,
       'ddx': ddx,
       'ivx': ivx,
+      'tags': tags
     };
   }
 
@@ -258,6 +279,7 @@ class MyCase {
       managementPlan: map['managementPlan'] as String,
       ddx: map['ddx'] as String,
       ivx: map['ivx'] != null ? map['ivx'] as String : null,
+      tags: map['tags'] != null ? List<String>.from((map['tags'] as List<dynamic>)) : null
     );
   }
 

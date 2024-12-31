@@ -21,6 +21,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   Future<BlogModel> uploadBlog(BlogModel blog) async {
     try {
       print(blog.toMapInsert());
+      
       final insertedBlog =
           await supabaseClient.from("blogs").insert(blog.toMapInsert()).select('* , profiles(id, name)');
           print("this is the blog --> ${insertedBlog.first}");

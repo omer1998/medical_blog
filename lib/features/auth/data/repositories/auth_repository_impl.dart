@@ -2,6 +2,7 @@
 import 'package:fpdart/src/either.dart';
 import 'package:medical_blog_app/core/constants/constant.dart';
 import 'package:medical_blog_app/core/profile_local_datasource.dart';
+import 'package:medical_blog_app/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:medical_blog_app/core/entities/user.dart';
@@ -69,11 +70,14 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserEntity?>> getUser() async {
     try {
+      print("==> connection is ${await connectionChecker.isConnected}");
       if (!(await connectionChecker.isConnected)) {
         print("----- ? true");
         final session = authRemoteDataSource.userSession;
+        print("==> session is ${session}");
         if (session != null) {
           final user = await profileLocalDatasource.getUser();
+          print("---->>> user from local db: $user");
           return right(user);
           // return right(UserEntity(
           //     name:  "", email: session.user.email ?? "", id: session.user.id));
@@ -107,5 +111,11 @@ class AuthRepositoryImpl implements AuthRepository {
       return left(Failure(message: e.toString()));
     }
     
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateProfile(UpdateProfileParams params) {
+    // first upload profile image
+    return authRemoteDataSource.updateProfile(params);
   }
 }

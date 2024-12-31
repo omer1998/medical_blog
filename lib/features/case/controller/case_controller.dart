@@ -6,11 +6,24 @@ import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cu
 import 'package:medical_blog_app/core/error/failures.dart';
 import 'package:medical_blog_app/core/utils/show_snackbar.dart';
 import 'package:medical_blog_app/features/case/models/case_model.dart';
+import 'package:medical_blog_app/features/case/models/custom_case_model.dart';
 import 'package:medical_blog_app/features/case/pages/cases_page.dart';
 import 'package:medical_blog_app/features/case/repository/case_repository.dart';
 
-final getCasesProvider = FutureProvider.autoDispose<List<MyCase>>((ref) async {
+final getCasesProvider = FutureProvider<List<MyCase>>((ref) async {
   return ref.read(caseControllerProvider).retrieveCases();
+});
+
+final getCasesTagsProvider = StateProvider<List<String>>((ref) {
+  return [];
+});
+
+final selectedTagsProvider = StateProvider<List<String>>((ref) {
+  return [];
+});
+
+final getCaseByIdProvider = FutureProvider.family<MyCase, String>((ref, caseId) async {
+  return ref.read(caseControllerProvider).retrieveCaseById(caseId);
 });
 final caseControllerProvider = Provider<CaseController>((ref) {
   return CaseController(ref: ref);
@@ -20,6 +33,14 @@ class CaseController {
   final Ref ref;
 
   CaseController({required this.ref});
+
+  Future<MyCase> retrieveCaseById(String caseId) async {
+    try {
+      return await ref.read(caseRepoProvider).retrieveCaseById(caseId); 
+    } catch (e) {
+      rethrow; 
+    }
+  }
 
   retriveCasesByTags(BuildContext context) async {
     final selectedTags = ref.read(selectedTagsProvider);
@@ -42,6 +63,13 @@ class CaseController {
       final cases = await ref.read(caseRepoProvider).retrieveCases();
       print("Cases from supabase");
       print(cases);
+      // get tags of cases
+      List<String> tags = [];
+      cases.forEach((c){
+        tags.addAll(c.tags ?? []);
+      });
+      tags = tags.toSet().toList();
+      ref.read(getCasesTagsProvider.notifier).state = tags;
       return cases;
     } catch (e) {
       throw e;
@@ -59,7 +87,7 @@ class CaseController {
     }
   }
 
-  addCase(BuildContext context, Case myCase) async {
+  Future<void> addCase(BuildContext context, Case myCase) async {
     final id =
         (context.read<AppUserCubit>().state as UserLoggedInState).user.id;
     print("user id ");
@@ -75,4 +103,16 @@ class CaseController {
       showSnackBar(context, "Case added Successfuly");
     });
   }
+
+  Future<Either<Failure, Case>> updateCase(BuildContext context, Case myCase) async {
+    final res = await ref.read(caseRepoProvider).updateCase(myCase: myCase);
+    return res;
+  }
+
+  // add addCustomCase method
+  Future<Either<Failure, void>> addCustomCase(CustomCaseModel customCaseModel) async {
+    final res = await ref.read(caseRepoProvider).addCustomCase(myCase: customCaseModel);
+    return res;
+  }
+  // add updateCustomCase method
 }

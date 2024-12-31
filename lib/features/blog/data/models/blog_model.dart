@@ -9,11 +9,12 @@ class BlogModel extends BlogEntity {
       required super.publishedDate,
       required super.topics,
       required super.imageUrl,
+      super.contentJson,
       super.authorName});
 
   @override
   String toString() {
-    return "$authorId , $title, $content, $authorId, $publishedDate, $topics, $imageUrl";
+    return "$authorId , $title, $content, $authorId, $publishedDate, $topics, $imageUrl, $contentJson";
   }
 
   Map<String, dynamic> toMap() {
@@ -25,7 +26,8 @@ class BlogModel extends BlogEntity {
       'published_date': publishedDate.toIso8601String(),
       'topics': topics,
       'image_url': imageUrl,
-      "author_name": authorName
+      "author_name": authorName,
+      "content_json": contentJson,
     };
   }
   Map<String, dynamic> toMapInsert(){
@@ -37,6 +39,8 @@ class BlogModel extends BlogEntity {
       'published_date': publishedDate.toIso8601String(),
       'topics': topics,
       'image_url': imageUrl,
+      "content_json": contentJson,
+
     };
   }
   factory BlogModel.fromMap(Map<dynamic, dynamic> map) {
@@ -48,7 +52,8 @@ class BlogModel extends BlogEntity {
         publishedDate: DateTime.parse(map['published_date']),
         topics: List.from(map['topics']).cast<String>(),
         imageUrl: map["image_url"],
-        authorName: map['profiles']['name'] ?? "");
+        authorName: map["profiles"] != null ? map['profiles']['name'] ?? "" : "",
+        contentJson: map["content_json"] ?? "");
   }
   factory BlogModel.fromJson(Map<dynamic, dynamic> map) {
     return BlogModel(

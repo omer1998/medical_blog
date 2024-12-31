@@ -2,335 +2,276 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:medical_blog_app/core/utils/extensions.dart';
+import 'package:medical_blog_app/features/case/controller/case_controller.dart';
 import 'package:medical_blog_app/features/case/models/case_info_model.dart';
 import 'package:medical_blog_app/features/case/models/case_ivx_model.dart';
 import 'package:medical_blog_app/features/case/models/case_model.dart';
+import 'package:medical_blog_app/features/case/pages/widgets/case_section.dart';
 import 'package:medical_blog_app/features/case/pages/widgets/case_seg_title.dart';
 import 'package:medical_blog_app/features/case/pages/widgets/case_text.dart';
-class CaseViewPage extends StatefulWidget {
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
+import 'package:medical_blog_app/features/case/pages/edit_case_page.dart';
+
+class CaseViewPage extends ConsumerStatefulWidget {
   final MyCase myCase;
   final CaseInfo caseInfo;
   final CaseIvx caseIvx;
-  const CaseViewPage({super.key, required this.myCase, required this.caseInfo, required this.caseIvx});
-
-  @override
-  State<CaseViewPage> createState() => _CaseViewPageState();
-}
-
-class _CaseViewPageState extends State<CaseViewPage> {
   
-late ExpansionTileController hxController;
-late ExpansionTileController examController;
-late ExpansionTileController ivxController;
-late ExpansionTileController managementController;
-late ExpansionTileController followController;
+  const CaseViewPage({
+    super.key,
+    required this.myCase,
+    required this.caseInfo,
+    required this.caseIvx,
+  });
 
-bool hxTileState = false;
-bool examTileState = false;
-bool ivxTileState = false;
-bool managementTileState = false;
-bool followTileState = false;
-
-onExpansion(ExpansionTileController main, bool state){
-  List<ExpansionTileController> controllers = [hxController, examController, ivxController, managementController, followController];
-  if (state == true) {
-    controllers.forEach((element) {
-      if (element != main) {
-        element.collapse();
-      }
-    });
-  }
-
-}
-
-changeTileState (bool state, ExpansionTileController controller){
-  if (state) {
-    controller.collapse();
-  } else {
-    controller.expand();
-  }
-
-}
-
-@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  hxController = ExpansionTileController();
-  examController = ExpansionTileController();
-  ivxController = ExpansionTileController();
-  managementController = ExpansionTileController();
-  followController = ExpansionTileController();
- 
-  }
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    
+  ConsumerState<CaseViewPage> createState() => _CaseViewPageState();
+}
+
+class _CaseViewPageState extends ConsumerState<CaseViewPage> {
+  
+
+  @override
+  void initState() {
+    super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-       
-
+    final myCase = widget.myCase;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Case View"),
+        title: const Text("Case View"),
         centerTitle: true,
+        actions: [
+          BlocBuilder<AppUserCubit, AppUserState>(
+            builder: (context, state) {
+              if (state is UserLoggedInState && 
+                  state.user.id == myCase.case_author) {
+                return IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () async {
+                    ref.read(selectedTagsProvider.notifier).state = myCase.tags ?? [];
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditCasePage(
+                          myCase: myCase,
+                          caseInfo: myCase.caseInfo!,
+                          caseIvx: myCase.caseIvx!,
+                        ),
+                      ),
+                    );
+                    
+                    
+                  },
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ListView(
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CaseText(text: widget.myCase.case_name.capitalize()),
-            Row(
-              children: widget.myCase.tags!.map((e) => Container(
-                  margin: EdgeInsets.only(right: 5),
-                  child:  Chip(
-                      backgroundColor: Colors.grey,
-                      side: BorderSide.none,
-                      clipBehavior: Clip.antiAlias,
-                      label: Text(
-                        e,
-                        style: TextStyle(color: Colors.black),
-                      )),
-                ) ).toList()
-                
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "By ${widget.myCase.name}",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+                    Theme.of(context).colorScheme.surface,
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).shadowColor.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                      "${DateFormat("d MMM y").format(DateTime.parse(widget.myCase.created_at))}"),
-                ),
-              ],
-            ),
-            Divider(
-              height: 2,
-              thickness: 2,
-              // indent: 20,
-              // endIndent: 20,
-            ),
-            InkWell(
-              onTap: (){
-                changeTileState(hxTileState, hxController);
-              },
-              child: ExpansionTile(
-                
-                controller: hxController,
-                onExpansionChanged: (value) {
-                hxTileState = value;
-                  onExpansion(hxController, value);
-                },
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                expandedAlignment: Alignment.topLeft,
-                title: Text(
-                  "History",
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                children: [
-                  // CaseSegmentText(title: "Demographic Data", text: caseInfo.demographic_data),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CaseSegmentTitle(title: "Demographis data"),
-                        Text(widget.caseInfo.demographic_data),
-                        SizedBox(height: 10),
-                        CaseSegmentTitle(title: "Chief Complain"),
-                        Text(widget.caseInfo.cheif_complain),
-                        SizedBox(height: 10),
-                        CaseSegmentTitle(title: "History of Present illness"),
-                        Text(widget.caseInfo.illness_hx),
-                  
-                  
-                        SizedBox(height: 10),
-                        CaseSegmentTitle(title: "Review of System"),
-                        Text(widget.caseInfo.review_hx),
-                  
-                        SizedBox(height: 10,),
-                        CaseSegmentTitle(title: "Medication History"),
-                        Text(widget.caseInfo.meds_hx),
-                  
-                        
-                        SizedBox(height: 10,),
-                        CaseSegmentTitle(title: "Past Medical History"),
-                        Text(widget.caseInfo.pmh),
-                  
-                        
-                        SizedBox(height: 10,),
-                        CaseSegmentTitle(title: "Past Surgical History"),
-                        Text(widget.caseInfo.psh),
-                  
-                        
-                        SizedBox(height: 10,),
-                        CaseSegmentTitle(title: "Family History"),
-                        Text(widget.caseInfo.family_hx),
-                      ],
-                    ),
-                  )
                 ],
               ),
-            ),
-            InkWell(
-              onTap: (){
-                changeTileState(examTileState, examController);
-              },
-              child: ExpansionTile(
-                // dense: true,
-                onExpansionChanged: (value) {
-                  setState(() {
-                    examTileState = value;
-                  });
-                  onExpansion(examController, value);
-                },
-                
-                controller: examController,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                collapsedShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                backgroundColor: Color.fromRGBO(45, 5, 243, 1),
-                collapsedBackgroundColor: Color.fromRGBO(45, 5, 243, 1),
-                title: Text("Physical Examination",  
-                  style: Theme.of(context).textTheme.headlineSmall,   
-              ),
-              expandedAlignment: Alignment.topLeft,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    myCase.case_name.capitalize(),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
                     children: [
-                      CaseSegmentTitle(title: "Vital Signs"),
-                  Text(widget.caseInfo.vital_signs),
-                  SizedBox(height: 10,),
-                  
-                  CaseSegmentTitle(title: "General Examination"),
-                  Text(widget.caseInfo.physical_exam)
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        child: Text(
+                          myCase.name![0].toUpperCase(),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              myCase.name!,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              DateFormat('MMMM d, yyyy').format(DateTime.parse(myCase.created_at ?? DateTime.now().toIso8601String())),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                )
-              ],
+                  const SizedBox(height: 16),
+                  if (myCase.tags != null && myCase.tags!.isNotEmpty) ...[
+                    Text(
+                      'Topics',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: myCase.tags!.map((tag) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Chip(
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.2),
+                            side: BorderSide.none,
+                            labelStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            avatar: Icon(
+                              Icons.local_offer_outlined,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            label: Text(tag),
+                          ),
+                        )).toList(),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-            SizedBox(height: 5,),
-            InkWell(
-              onTap: (){
-                changeTileState(ivxTileState, ivxController);
-              },
-              child: ExpansionTile(
-                onExpansionChanged: (value) {
-                    setState(() {
-                      ivxTileState = value;
-                    });
-                    onExpansion(ivxController, value);
-                  },
-                  
-                controller: ivxController,
-                title: Text("Investigations", style: Theme.of(context).textTheme.headlineSmall,),
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                expandedAlignment: Alignment.topLeft,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CaseSegmentTitle(title: "Lab Results"),
-                        Text(widget.caseIvx.inv_data),
-                        SizedBox(height: 10,),
-                        CaseSegmentTitle(title: "Result Images"),
-                        Text(widget.caseIvx.inv_imgs.isEmpty ? "No Images For this case" : widget.caseIvx.inv_imgs.join(", ")),
-                        
-                      ],
-                    ),
-                  )
+                  CaseSection(
+                    title: "History",
+                    icon: Icons.history_edu,
+                    children: [
+                      _buildHistorySection("Demographics", widget.caseInfo.demographic_data),
+                      _buildHistorySection("Chief Complaint", widget.caseInfo.cheif_complain),
+                      _buildHistorySection("Present Illness", widget.caseInfo.illness_hx),
+                      _buildHistorySection("Review of Systems", widget.caseInfo.review_hx),
+                      _buildHistorySection("Medications", widget.caseInfo.meds_hx),
+                      _buildHistorySection("Past Medical History", widget.caseInfo.pmh),
+                      _buildHistorySection("Past Surgical History", widget.caseInfo.psh),
+                      _buildHistorySection("Family History", widget.caseInfo.family_hx),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  CaseSection(
+                    title: "Physical Examination",
+                    icon: Icons.medical_services,
+                    children: [
+                      _buildHistorySection("Physical Exam", widget.caseInfo.physical_exam),
+                      _buildHistorySection("Vital Signs", widget.caseInfo.vital_signs),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  CaseSection(
+                    title: "Investigation",
+                    icon: Icons.science,
+                    children: [
+                      _buildHistorySection("Investigation Data", widget.caseIvx.inv_data),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  CaseSection(
+                    title: "Management",
+                    icon: Icons.healing,
+                    children: [
+                      _buildHistorySection("Management Plan", widget.caseInfo.management_plan),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  CaseSection(
+                    title: "Follow Up",
+                    icon: Icons.event_note,
+                    children: [
+                      _buildHistorySection("Follow Up Notes", widget.caseInfo.followup_notes),
+                    ],
+                  ),
                 ],
-                
               ),
             ),
-            
-            SizedBox(height: 5,),
-            InkWell(
-              onTap: (){
-                changeTileState(managementTileState, managementController);
-              },
-              child: ExpansionTile(
-                onExpansionChanged: (value) {
-                      setState(() {
-                        managementTileState = value;
-                      });
-                      onExpansion(managementController, value);
-                    },
-                controller: managementController,
-                // childrenPadding: EdgeInsets.all(10),
-                title: Text("Management Plan", style: Theme.of(context).textTheme.headlineSmall,),
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                expandedAlignment: Alignment.topLeft,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.caseInfo.followup_notes)
-                        
-                      ],
-                    ),
-                  )
-                ],
-                
-              ),
-            ),
-            SizedBox(height: 5,),
-             InkWell(
-              onTap: (){
-                changeTileState(followTileState, followController);
-              },
-               child: ExpansionTile(
-                onExpansionChanged: (value) {
-                        setState(() {
-                          followTileState = value;
-                        });
-                        onExpansion(followController, value);
-                      },
-                controller: followController,
-                title: Text("Follow Up Notes", style: Theme.of(context).textTheme.headlineSmall,),
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                expandedAlignment: Alignment.topLeft,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.caseInfo.followup_notes)
-                        
-                      ],
-                    ),
-                  )
-                ],
-                
-                           ),
-             ),
           ],
         ),
       ),
     );
   }
-}
 
+  Widget _buildHistorySection(String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.9),
+              letterSpacing: 0.2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.6,
+              color: Theme.of(context).colorScheme.onBackground.withOpacity(0.9),
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

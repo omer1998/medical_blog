@@ -4,9 +4,9 @@ add medical calculation and drug doses
 add profile page --> saving user about section / speciality/ current institution/ profile image/ (with updating the database and saving user profile info in my local database)
 make the user able to update his profile info
 update user drawer to include follwing section (list tiles): 
-    my profile  
+    my profile  T
     favorite cases
-    favorite blogs
+    favorite blogs  T
     my cases
     my blogs
     setting
@@ -18,5 +18,7 @@ add update feature to cases
 add comment section to cases and sebssequently apply this to blogs
 
 fix local storage for blogs
+add offline storage for comments
+add offline storage for the favorited blogs for this user; to know which blog is favortie when the user offline
 adding chating feature between users
 refactor the design of blogs and cases card (retrieve idea from health 360)

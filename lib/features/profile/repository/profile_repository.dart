@@ -2,12 +2,16 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:medical_blog_app/core/entities/user.dart';
 import 'package:medical_blog_app/core/error/exceptions.dart';
 import 'package:medical_blog_app/core/error/failures.dart';
 import 'package:medical_blog_app/core/profile_local_datasource.dart';
 import 'package:medical_blog_app/core/providers/provider.dart';
 import 'package:medical_blog_app/core/storage.dart';
+import 'package:medical_blog_app/core/utils/check_connection.dart';
 import 'package:medical_blog_app/features/auth/data/models/user_model.dart';
+import 'package:medical_blog_app/features/blog/data/models/blog_model.dart';
+import 'package:medical_blog_app/features/case/models/case_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
@@ -21,6 +25,59 @@ class ProfileRepository {
   final Ref ref;
 
   ProfileRepository({required this.profileLocalDatasource, required this.ref});
+
+  Future<List<MyCase>> getUserCases(String userId) async {
+    try {
+      // print("cases: ${await isConnected()}");
+      if (await isConnected()) {
+        // print("cases");
+        final cases = await ref.read(supabaseClientProvider).from("cases").select().eq("case_author", userId);
+        // print("cases: $cases");
+       final casesModels= cases.map((element){
+       return  MyCase.fromMap(element);
+       }).toList();
+        return casesModels;
+      } else {
+        throw ServerException("No Internet Connection");
+      }
+  }catch (e) {
+    rethrow;
+  }
+  }
+  Future<List<BlogModel>> getUserBlogs(String userId) async {
+    try {
+      // print("cases: ${await isConnected()}");
+      if (await isConnected()) {
+        // print("cases");
+        final blogs = await ref.read(supabaseClientProvider).from("blogs").select().eq("author_id", userId);
+       final blogModels= blogs.map((element){
+       return  BlogModel.fromMap(element);
+       }).toList();
+        return blogModels;
+      } else {
+        throw ServerException("No Internet Connection");
+      }
+  }catch (e) {
+    rethrow;
+  }
+  }
+  Future<UserEntity> getUserProfileInfo(String userId)async{
+    try {
+     if (await isConnected()) {
+      final userData = await ref.read(supabaseClientProvider).from("profiles").select().eq("id", userId).single();
+      final userModel = UserModel.fromJson(userData);
+      print("object: $userModel" );
+      return userModel;
+     }else {
+      throw ServerException('No internet connection');
+     }
+      
+    } on ServerException  {
+      rethrow;
+    } catch (e) {
+      throw ServerException("${e.toString()} error fetching user profile info");
+    }
+  }
   Future<bool> updatePassword(String password) async {
     try {
       print("passsssssssssssssss");

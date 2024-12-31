@@ -9,8 +9,9 @@ class BlogEntity {
   final List<String> topics;
   final String imageUrl;
   final String? authorName;
+  final String? contentJson;
 
-  BlogEntity(
+  BlogEntity( 
       {required this.id,
       required this.title,
       required this.content,
@@ -18,5 +19,6 @@ class BlogEntity {
       required this.publishedDate,
       required this.topics,
       required this.imageUrl,
-      this.authorName});
+      this.authorName,
+      this.contentJson,});
 }

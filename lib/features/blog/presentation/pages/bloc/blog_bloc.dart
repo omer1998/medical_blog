@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
 import 'package:medical_blog_app/features/blog/domain/usecases/fav_blog_usecase.dart';
 import 'package:meta/meta.dart';
@@ -16,6 +17,8 @@ import 'package:medical_blog_app/features/blog/domain/usecases/upload_blog_useca
 
 part 'blog_event.dart';
 part 'blog_state.dart';
+
+
 
 class BlogBloc extends Bloc<BlogEvent, BlogState> {
   final UploadBlogUseCase uploadBlogUseCase;
@@ -47,6 +50,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
         final response = await uploadBlogUseCase(BlogData(
             title: event.title,
             content: event.content,
+           
             image: event.image,
             authorId: event.authorId,
             topics: event.topics));
@@ -63,6 +67,8 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
         response.fold((l) => emit(BlogFailureState(message: l.message)), (r) {
           allBlogs = r;
           final availableTopics = r.map((blog) => blog.topics).expand((topics) => topics).toSet().toList();
+
+
           emit(BlogsSuccessState(blogs: r , selectedTopic: null, availableTopics: availableTopics));
         });
       },
@@ -71,7 +77,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       if (state is BlogsSuccessState){
         final currentState = state as BlogsSuccessState;
         final selectedTopic = event.selectedTopic;
-      if (selectedTopic == null) {
+      if (selectedTopic == null || selectedTopic == "All") {
         emit(BlogsSuccessState(blogs: allBlogs, selectedTopic: selectedTopic, availableTopics: currentState.availableTopics));
       } else {
         final filteredBlogs = allBlogs

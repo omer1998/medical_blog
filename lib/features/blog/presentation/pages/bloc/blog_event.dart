@@ -10,12 +10,14 @@ final class BlogUploadBlogEvent extends BlogEvent {
   final File image;
   final String authorId;
 
+
   BlogUploadBlogEvent(
       {required this.authorId,
       required this.image,
       required this.title,
       required this.content,
-      required this.topics});
+      required this.topics, 
+      });
 }
 
 

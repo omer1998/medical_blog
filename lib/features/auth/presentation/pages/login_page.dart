@@ -107,9 +107,9 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           BlocProvider.of<AuthBloc>(context).add(SignInEvent(
-                              data: SignInData(
+                              
                                   email: emailController.text.trim(),
-                                  password: passwordController.text.trim())));
+                                  password: passwordController.text.trim()));
                         }
                       }),
                   SizedBox(

@@ -11,16 +11,26 @@ class ProfileLocalDatasource {
   Future<UserModel> getUser() async {
     try {
       final profileBox = await Hive.openBox("profileBox");
-      dynamic user = profileBox.get("user");
+      final user = profileBox.get("user");
+      print("Raw user type: ${user.runtimeType}");
+      print("Raw user content: $user");
       if (user != null) {
-        user = user.cast<String, dynamic>();
+        Map<String, dynamic> userMap = {};
+        user.forEach((key, value) {
+          userMap[key.toString()] = value;
+        });
+       
+        print("user after cast ${userMap.runtimeType}");
+        print("user is ${userMap}");
         profileBox.close();
-        final userModel = UserModel.fromJson(user);
+
+        final userModel = UserModel.fromJson(userMap);
         return userModel;
       } else {
         throw LocalStorageException(message: "Error; user not found");
       }
     } catch (e) {
+      print("error in getting user from local db ${e.toString()}");
       throw LocalStorageException(
           message: "Error geting user from local DB ${e.toString()}");
     }

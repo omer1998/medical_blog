@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:medical_blog_app/core/entities/user.dart';
-
+import 'package:medical_blog_app/features/auth/domain/usecases/update_profile_usecase.dart';
 import '../../../../core/error/failures.dart';
 
 abstract interface class AuthRepository {
@@ -16,4 +16,6 @@ abstract interface class AuthRepository {
   Future<Either<Failure, UserEntity?>> getUser();
 
   Future<Either<Failure, void>> logOut();
+
+  Future<Either<Failure, UserEntity>> updateProfile(UpdateProfileParams params);
 }

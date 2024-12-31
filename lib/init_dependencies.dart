@@ -12,6 +12,7 @@ import 'package:medical_blog_app/features/auth/domain/usecases/log_out_usecase.d
 import 'package:medical_blog_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
+import 'package:medical_blog_app/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/blog/data/datasources/local_data_source.dart';
 import 'package:medical_blog_app/features/blog/data/datasources/remote_data_source.dart';
@@ -59,12 +60,16 @@ void initAuth() {
   getIt.registerFactory<UserStateUseCase>(
       () => UserStateUseCase(authRepository: getIt()));
 
+  getIt.registerFactory<UpdateProfileUseCase>(
+      () => UpdateProfileUseCase( getIt<AuthRepository>()));
+
   getIt.registerLazySingleton<AppUserCubit>(() => AppUserCubit());
   getIt.registerLazySingleton<AuthBloc>(() => AuthBloc(
       logOutUsecase: getIt(),
       signUpUseCase: getIt(),
       signInUseCase: getIt(),
       userStateUseCase: getIt(),
+      updateProfileUseCase: getIt(),
       appUserCubit: getIt()));
 }
 

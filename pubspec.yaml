@@ -47,10 +47,11 @@ dependencies:
   hive: ^2.2.3
   hive_flutter:
   isar_flutter_libs: ^4.0.0-dev.13
-  path_provider: ^2.1.0
+  path_provider: ^2.1.1
   # cached_network_image: ^3.3.1
   fast_cached_network_image: ^1.2.9
-  flutter_quill: ^9.3.21
+  flutter_quill: ^9.2.10
+  
   flutter_riverpod: ^2.5.1
   persistent_bottom_nav_bar_v2: ^5.2.3
   build_runner: ^2.4.11
@@ -69,8 +70,14 @@ dependencies:
   ionicons: ^0.2.2
   equatable: ^2.0.5
   icons_plus: ^5.0.0
-  share_plus: ^10.1.1
+  share_plus: ^7.2.1
   collection: ^1.17.2
+  url_launcher: ^6.3.1
+  fl_chart: ^0.69.2
+  csv: ^5.1.1
+  rename: ^3.0.2
+  file_picker: ^8.1.7
+
 
 dev_dependencies:
   flutter_test:
@@ -97,6 +104,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/profile_images/
+    - assets/images/omi/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

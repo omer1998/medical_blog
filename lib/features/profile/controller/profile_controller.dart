@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:medical_blog_app/core/common/widgets/cubits/app_user/app_user_cubit.dart';
+import 'package:medical_blog_app/core/entities/user.dart';
 import 'package:medical_blog_app/core/providers/provider.dart';
 import 'package:medical_blog_app/core/storage.dart';
 import 'package:medical_blog_app/core/utils/show_snackbar.dart';
 import 'package:medical_blog_app/features/auth/data/models/user_model.dart';
+import 'package:medical_blog_app/features/blog/data/models/blog_model.dart';
+import 'package:medical_blog_app/features/case/models/case_model.dart';
 import 'package:medical_blog_app/features/profile/page/profile_page.dart';
 import 'package:medical_blog_app/features/profile/repository/profile_repository.dart';
 
@@ -17,10 +20,49 @@ final profileControllerProvider =
   return ProfileController(ref: ref);
 });
 
+final getUserProfileInfoProvider = FutureProvider.family<UserEntity, String>((ref, id) async {
+  return await ref.read(profileControllerProvider.notifier).getUserProfileInfo(id);
+});
+final getUserCasesProvider = FutureProvider.family<List<MyCase>, String>((ref, id) async {
+  return  await ref.read(profileControllerProvider.notifier).getUserCases(id);
+});
+final getUserBlogsProvider = FutureProvider.family<List<BlogModel>, String>((ref, id) async {
+  return  await ref.read(profileControllerProvider.notifier).getUserBlogs(id);
+});
+
 class ProfileController extends StateNotifier<bool> {
   final Ref ref;
 
   ProfileController({required this.ref}) : super(false);
+
+  Future<List<BlogModel>> getUserBlogs(String userId) async {
+    try {
+      final blogs = await ref. read(profileRepositoryProvider).getUserBlogs(userId);
+      return blogs;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+    Future<List<MyCase>> getUserCases(String userId) async {
+    try {
+      final cases = await ref.read(profileRepositoryProvider).getUserCases(userId); 
+      return cases;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  getUserProfileInfo(String id) async {
+    try {
+      final user = await ref.read(profileRepositoryProvider).getUserProfileInfo(id);
+    return user;
+ 
+    } catch (e) {
+      rethrow;
+    }
+    
+  }
   updateImgUrl(File image, UserModel user, BuildContext context) async {
     state = true;
     final res =

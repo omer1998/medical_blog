@@ -6,6 +6,7 @@ import 'package:medical_blog_app/features/auth/data/models/user_model.dart';
 import 'package:medical_blog_app/features/auth/domain/usecases/user_state_usecase.dart';
 import 'package:medical_blog_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:medical_blog_app/features/auth/presentation/pages/login_page.dart';
+import 'package:medical_blog_app/features/auth/presentation/pages/profile_completion_page.dart';
 import 'package:medical_blog_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:medical_blog_app/features/case/models/case_info_model.dart';
 import 'package:medical_blog_app/features/case/models/case_ivx_model.dart';
@@ -56,7 +57,7 @@ final router = GoRouter(
                 GoRoute(
                   path: "add_case",
                   name: "add_case",
-                  builder: (context, state) => AddCasePage(),
+                  builder: (context, state) => AddCasePage(userId: state.extra as String),
                 ),
               ])
         ]),
@@ -91,5 +92,8 @@ final router = GoRouter(
       name: "logout",
       builder: (context, state) => const MainPage(),
     ),
+    GoRoute(path: "/profile_completion",
+    name: "profile_completion", 
+    builder: (context, state) => const ProfileCompletionPage())
   ],
 );

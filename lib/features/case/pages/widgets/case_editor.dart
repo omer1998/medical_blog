@@ -13,24 +13,38 @@ class CaseEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        focusNode: FocusNode(),
-        controller: controller,
-        decoration: InputDecoration(hintText: hintText),
-        maxLines: null,
-        minLines: minLine,
-        validator: (value) {
-          if (require){
-            if (value!.isEmpty) {
-            return "${hintText} field is required";
-          } else {
-            return null;
-          }
-          }else {
-            return null;
-          }
-          
-        },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                hintText,
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontSize: 20),
+              ),
+            ),
+          ),
+          TextFormField(
+            focusNode: FocusNode(),
+            controller: controller,
+            decoration: InputDecoration(hintText: hintText),
+            maxLines: null,
+            minLines: minLine,
+            validator: (value) {
+              if (require){
+                if (value!.isEmpty) {
+                return "${hintText} field is required";
+              } else {
+                return null;
+              }
+              }else {
+                return null;
+              }
+              
+            },
+          ),
+        ],
       ),
     );
   }

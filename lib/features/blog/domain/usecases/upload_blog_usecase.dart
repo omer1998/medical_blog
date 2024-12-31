@@ -28,6 +28,7 @@ class BlogData {
   final String authorId;
   final List<String> topics;
 
+
   BlogData(
       {required this.title,
       required this.content,
